@@ -1,0 +1,180 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Weather from '../../components/Weather.astro';
+import { uniqueAreas, issueNumbers } from '../../lib/theme';
+
+export async function getStaticPaths() {
+  const issues = await getCollection('issues');
+  const numbers = issueNumbers(issues.map((i) => i.id));
+  return issues.map((issue) => ({
+    params: { slug: issue.id },
+    props: { issue, no: numbers.get(issue.id)! },
+  }));
+}
+
+const { issue, no } = Astro.props;
+const { Content } = await render(issue);
+const areaTags = uniqueAreas(issue.data.picks);
+---
+<Base title={`${issue.data.title} · Our Weekend Plans`} description={issue.data.teaser}>
+  <div class="detail">
+    <article class="article-wrap">
+      <a class="back-link" href="/">
+        <span class="back-link__arrow">←</span> All our plans
+      </a>
+
+      <div class="masthead">
+        <div class="masthead__meta">
+          <span>Plan No. {no}</span>
+          <span class="masthead__slash">/</span>
+          <span class="masthead__date">{issue.data.dateLong}</span>
+        </div>
+        <h1 class="title">{issue.data.title}</h1>
+        <p class="teaser">{issue.data.teaser}</p>
+        <div class="tags">
+          <span class="tag tag--weather">
+            <Weather kind={issue.data.weather.kind} color="#332B22" size={16} />
+            {issue.data.weather.label}
+          </span>
+          {areaTags.map((t) => (
+            <span class="tag tag--area" style={`color:${t.color};border-color:${t.color}`}>
+              {t.name}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="article">
+        <Content />
+      </div>
+
+      <footer class="footer">
+        <span class="footer__sign">That's the plan, you two. Go make a thing of it. 💛</span>
+        <a class="footer__btn" href="/">All our plans</a>
+      </footer>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .detail {
+    background: var(--paper);
+    min-height: 100vh;
+    padding-bottom: 120px;
+    animation: gmRise 0.5s var(--ease-out) both;
+  }
+  .article-wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 28px clamp(20px, 5vw, 40px) 0;
+  }
+  .back-link {
+    background: none;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rust);
+    text-decoration: none;
+    padding: 8px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .back-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .back-link__arrow { font-size: 16px; }
+
+  .masthead {
+    border-top: 1.5px solid var(--ink);
+    margin-top: 8px;
+    padding-top: 24px;
+  }
+  .masthead__meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .masthead__slash { color: #C6BCAB; }
+  .masthead__date { color: var(--taupe); }
+  .title {
+    margin: 14px 0 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(32px, 5.5vw, 60px);
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+  }
+  .teaser {
+    margin: 16px 0 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(17px, 2vw, 22px);
+    line-height: 1.4;
+    color: var(--taupe);
+    max-width: 42ch;
+  }
+  .tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+    align-items: center;
+  }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    padding: 7px 13px;
+  }
+  .tag--weather {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #332B22;
+    background: var(--cream);
+    border: 1px solid var(--rule);
+  }
+  .tag--area { border: 1px solid currentColor; }
+
+  .rule { height: 1px; background: var(--rule); margin: 30px 0; }
+
+  .footer {
+    border-top: 1.5px solid var(--ink);
+    margin: 48px 0 0;
+    padding: 24px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer__sign {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--taupe);
+  }
+  .footer__btn {
+    background: none;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .footer__btn:hover { background: var(--ink); color: var(--cream); }
+</style>

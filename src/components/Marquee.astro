@@ -1,0 +1,60 @@
+---
+// Scrolling masthead strip — a CSS reimplementation of the design system's
+// <Marquee>. The track is duplicated so the loop is seamless.
+interface Props {
+  items: string[];
+}
+const { items } = Astro.props;
+const loop = [...items, ...items];
+---
+<div class="marquee" role="presentation">
+  <div class="marquee__track">
+    {loop.map((item, i) => (
+      <span class="marquee__item" aria-hidden={i >= items.length ? 'true' : undefined}>
+        <span>{item}</span>
+        <span class="marquee__sep">✦</span>
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    background: var(--ink);
+    color: var(--cream);
+    height: 46px;
+    display: flex;
+    align-items: center;
+  }
+  .marquee__track {
+    display: inline-flex;
+    align-items: center;
+    will-change: transform;
+    animation: marquee-scroll 38s linear infinite;
+  }
+  .marquee:hover .marquee__track {
+    animation-play-state: paused;
+  }
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .marquee__sep {
+    color: #E0A93B;
+    margin: 0 1.4em;
+    font-size: 9px;
+  }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track { animation: none; }
+  }
+</style>
