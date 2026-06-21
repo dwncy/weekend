@@ -12,12 +12,20 @@ const issues = [...all].sort((a, b) => numbers.get(b.id)! - numbers.get(a.id)!);
 const latest = issues[0];
 const archive = issues.slice(1);
 
-const latestNo = numbers.get(latest.id)!;
-const latestCover = cover(latest.data.cover);
-const latestHref = withBase(`issues/${latest.id}/`);
+const latestNo = latest ? numbers.get(latest.id)! : 0;
+const latestCover = latest ? cover(latest.data.cover) : null;
+const latestHref = latest ? withBase(`issues/${latest.id}/`) : withBase('/');
 ---
 <Base title="Our Weekend Plans">
   <div class="page">
+    {!latest ? (
+      <div class="empty">
+        <div class="kicker">A love note with logistics · Jakarta</div>
+        <h1 class="wordmark">Our Weekend<br />Plans</h1>
+        <p class="empty__note">No plans up yet — the next one lands this Friday. 💛</p>
+      </div>
+    ) : (
+    <>
     <div class="marquee-bar">
       <Marquee items={marqueeItems(latestNo, latest.data)} />
     </div>
@@ -118,6 +126,8 @@ const latestHref = withBase(`issues/${latest.id}/`);
         </div>
       </section>
     </div>
+    </>
+    )}
   </div>
 </Base>
 
@@ -127,6 +137,36 @@ const latestHref = withBase(`issues/${latest.id}/`);
     position: relative;
     min-height: 100vh;
     width: 100%;
+  }
+  .empty {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: clamp(80px, 18vh, 200px) clamp(20px, 5vw, 64px);
+    animation: gmRise 0.5s var(--ease-out) both;
+  }
+  .empty .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 8px;
+  }
+  .empty .wordmark {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(34px, 6vw, 68px);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .empty__note {
+    margin: 28px 0 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(18px, 2vw, 24px);
+    color: var(--taupe);
   }
   .marquee-bar {
     border-bottom: 1.5px solid var(--ink);

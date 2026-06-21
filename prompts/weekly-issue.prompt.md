@@ -1,63 +1,55 @@
-Find good activities in Jakarta for the upcoming weekend.
+Find good things to do in Jakarta this coming weekend and publish them as one Markdown file to my site's repo.
 
-Prioritize **fresh sources**: current event/listing sources and recent social
-posts, including TikTok and Instagram accounts such as **@jktgo** when
-accessible. Favour what's actually on *this* weekend over evergreen lists. For
-each pick capture the dates, the location/area, why it's worth going, a rough
-budget, a weather-aware note, and a link or citation.
+## Repository
 
-## What to produce
+- Repo: **`dwncy/weekend`** (GitHub) · branch: **`main`** · content path: **`src/content/issues/`**
+- Work inside a clone of it. If you don't already have one:
+  ```bash
+  git clone https://github.com/dwncy/weekend.git && cd weekend
+  ```
+  (Auth must already be set up — a token or SSH key with push access. If it's a fresh clone, pull is implied.)
 
-One new Markdown file named
-`src/content/issues/<YYYY>-<MM>-<DD>-<kebab-title>.md` (use the upcoming
-Saturday's date and a short kebab-case slug of the title), with exactly this
-structure:
+**Freshness is the whole point.** Prioritize what's genuinely on *this* weekend, pulled from current sources — event/listing sites, ticketing pages, and recent social posts (TikTok, Instagram, e.g. **@jktgo**) from the last week or two. Skip evergreen "best of Jakarta" lists. Verify each pick's dates actually fall on or include this weekend before including it. For each pick capture: when it's on, where, why we'd love it, a rough budget, a weather note, and a real source link.
+
+## Produce
+
+One file at `src/content/issues/<YYYY>-<MM>-<DD>-<kebab-title>.md` (upcoming Saturday's date + kebab-case title), exactly:
 
 ```markdown
 ---
-title: "<evocative short title>"
-dateRange: "<short range, e.g. 'Jun 27–29'>"
-dateLong: "<full range with year, e.g. 'June 27–29, 2026'>"
+title: "<short evocative title>"
+dateRange: "<e.g. 'Jun 27–29'>"
+dateLong: "<e.g. 'June 27–29, 2026'>"
 year: "<YYYY>"
-teaser: "<one sentence hook>"
+teaser: "<one-sentence hook>"
 weather:
   kind: <sun | rain | cloud>
-  label: "<short label, e.g. 'Sunny, light rain pm'>"
-  hi: "<high temp, e.g. '33°'>"
+  label: "<e.g. 'Sunny, light rain pm'>"
+  hi: "<e.g. '33°'>"
 cover: <sunwheat | rainclay | heritage | mangrove>
 picks:
   - no: 1
     name: "<pick name>"
-    place: "<neighborhood / venue>"
     area: "<South | Central | North | West>"
-    date: "<when the event runs, e.g. '27–28 June 2026' or '11 June–12 July 2026; available this weekend'>"
+    date: "<e.g. '27–28 June 2026' or '11 June–12 July 2026; on this weekend'>"
     budget: "<rough, e.g. 'Rp 75–150k'>"
-    why: "<one or two sentences>"
   # …3–5 picks total
-top3:
-  - { name: "<short>", note: "<short reason>" }
-  - { name: "<short>", note: "<short reason>" }
-  - { name: "<short>", note: "<short reason>" }
 ---
 
-**Weekend of <dateLong without year>.** <2–3 sentences on the weather and the
-overall vibe of the weekend.>
+**Weekend of <dateLong without year>.** <2–3 sentences on weather + vibe.>
 
 ## 1. <Pick name>
-**Date:** <when the event runs — a date or date range, e.g. '27–28 June 2026'>
+**Date:** <date>
 **Area:** <Area> — <place>
-**Why go:** <A short paragraph on what it is and why it's worth it.>
+**Why go:** <short, inviting paragraph.>
 **Rough budget:** <budget>
-**Weather:** <a note>
-**Source:** [<source name>](<url>)
-
-(Keep each of **Date**, **Area**, **Rough budget**, **Weather**, **Source** on
-its own line — do not join two fields on one line with a separator.)
+**Weather:** <note>
+**Source:** [<source>](<url>)
 
 ## 2. <Pick name>
 …repeat for each pick…
 
-## My top 3
+## If you only do three things
 1. **<name>** — <reason>
 2. **<name>** — <reason>
 3. **<name>** — <reason>
@@ -67,29 +59,27 @@ its own line — do not join two fields on one line with a separator.)
 Have a good one!
 ```
 
+Each of **Date / Area / Rough budget / Weather / Source** on its own line.
+
 ## Constraints
 
-- **Dates:** compute the upcoming Saturday–Sunday for `dateRange` / `dateLong`
-  / `year`.
-- **No issue number.** Don't add a `no` field — the site derives the issue
-  number ("No. 14") automatically from the file's date.
-- **Fixed value sets** — do not invent others:
-  - `area`: `South | Central | North | West`
-  - `weather.kind`: `sun | rain | cloud`
-  - `cover`: `sunwheat | rainclay | heritage | mangrove` (rotate; prefer one
-    different from the previous issue)
-- **Areas: tag each pick with the venue's *real* Jakarta area. Map by location, for example:
-  - `South` — Senopati, Blok M, Kemang, SCBD, Ragunan, Cilandak
-  - `Central` — Thamrin, Sudirman, Menteng, Kemayoran,
-    GBK, Senayan
-  - `North` — Pantai Indah Kapuk (PIK), Ancol, Pluit
-  - `West` — Puri, Kebon Jeruk, Grogol
+- Compute the upcoming Saturday–Sunday for the date fields.
+- No `no` top-level field — the site numbers weekends from the file date.
+- Stay in the value sets above (`area`, `weather.kind`, `cover`); rotate `cover` off last weekend's.
+- Tag each pick's real area and spread across a few — don't park everything in one.
+- **Freshness:** every pick must be something actually happening this weekend, confirmed against a current/recent source, each with a real `**Source:**` link. Prefer the most recently posted listings. If a source is unreachable, use another current one — never invent or pad with evergreen filler.
+- Keep budgets/hours rough, not gospel; remind us to double-check before going.
+- Voice: warm, second-person ("you two"), playful, concise. One file only.
 
-- **Fresh over evergreen.** Prefer events specifically on this weekend, with a
-  `**Source:**` link for each pick. If a source is inaccessible, fall back to
-  other current listings — don't invent.
-- **Don't present prices, hours, or event dates as confirmed facts.** Keep
-  budgets rough and always include the *"note on sources"* disclaimer.
-- **Voice:** warm, second-person ("you two"), concise.
-- **One file only.**
+## Publish
+
+Commit just the new file to `main` (this triggers the auto-deploy):
+
+```bash
+git checkout main && git pull --rebase origin main
+git add "src/content/issues/<YYYY>-<MM>-<DD>-<kebab-title>.md"
+git commit -m "Add weekend: <title> (<dateRange>)"
+git push origin main
 ```
+
+If the push is rejected, `git pull --rebase origin main` and push again. Replace (don't duplicate) any existing file for the same weekend.
