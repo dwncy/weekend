@@ -1,0 +1,40 @@
+name: Deploy to GitHub Pages
+
+# Rebuilds and redeploys whenever content or site code changes on main —
+# so every new src/content/issues/*.md your automation pushes goes live.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a newer run finish; don't cancel an in-progress deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build with Astro
+        uses: withastro/action@v3
+        # Reads package.json/package-lock.json, runs the build, and uploads
+        # the dist/ artifact for the deploy job.
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

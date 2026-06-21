@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Marquee from '../components/Marquee.astro';
 import Weather from '../components/Weather.astro';
-import { cover, areaColor, marqueeItems, issueNumbers } from '../lib/theme';
+import { cover, areaColor, marqueeItems, issueNumbers, withBase } from '../lib/theme';
 
 const all = await getCollection('issues');
 const numbers = issueNumbers(all.map((i) => i.id));
@@ -14,7 +14,7 @@ const archive = issues.slice(1);
 
 const latestNo = numbers.get(latest.id)!;
 const latestCover = cover(latest.data.cover);
-const latestHref = `/issues/${latest.id}/`;
+const latestHref = withBase(`issues/${latest.id}/`);
 ---
 <Base title="Our Weekend Plans">
   <div class="page">
@@ -100,7 +100,7 @@ const latestHref = `/issues/${latest.id}/`;
             return (
               <a
                 class="issue-card"
-                href={`/issues/${iss.id}/`}
+                href={withBase(`issues/${iss.id}/`)}
                 style={`background:${cv.bg};color:${cv.fg}`}
               >
                 <div class="issue-card__grain"></div>

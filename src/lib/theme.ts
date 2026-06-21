@@ -25,6 +25,13 @@ export function cover(key: CoverKey) {
   return COVERS[key];
 }
 
+// Prefix an internal path with the configured base (e.g. '/weekend/') so links
+// work both locally and on GitHub Pages. Handles slashes idempotently.
+export function withBase(path: string): string {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return base + '/' + path.replace(/^\//, '');
+}
+
 // Issue numbers are derived, not authored. The oldest issue is "No. 9"
 // (preserving the original design's numbering) and each newer weekend counts up
 // from there. Entry ids start with the issue's date (YYYY-MM-DD-…), so sorting

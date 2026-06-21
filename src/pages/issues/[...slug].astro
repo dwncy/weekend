@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Weather from '../../components/Weather.astro';
-import { uniqueAreas, issueNumbers } from '../../lib/theme';
+import { uniqueAreas, issueNumbers, withBase } from '../../lib/theme';
 
 export async function getStaticPaths() {
   const issues = await getCollection('issues');
@@ -20,7 +20,7 @@ const areaTags = uniqueAreas(issue.data.picks);
 <Base title={`${issue.data.title} · Our Weekend Plans`} description={issue.data.teaser}>
   <div class="detail">
     <article class="article-wrap">
-      <a class="back-link" href="/">
+      <a class="back-link" href={withBase('/')}>
         <span class="back-link__arrow">←</span> All our plans
       </a>
 
@@ -53,7 +53,7 @@ const areaTags = uniqueAreas(issue.data.picks);
 
       <footer class="footer">
         <span class="footer__sign">That's the plan, you two. Go make a thing of it. 💛</span>
-        <a class="footer__btn" href="/">All our plans</a>
+        <a class="footer__btn" href={withBase('/')}>All our plans</a>
       </footer>
     </article>
   </div>
