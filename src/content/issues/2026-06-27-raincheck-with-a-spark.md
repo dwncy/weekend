@@ -3,12 +3,12 @@ title: "Raincheck with a Spark"
 dateRange: "Jun 27–28"
 dateLong: "June 27–28, 2026"
 year: "2026"
-teaser: "A hot, storm-aware weekend for you two: one big anchor, one playful backup, and no pressure to over-plan."
+teaser: "A hot, storm-aware weekend for you two: sweat a little, hide in art, then chase one good sunset."
 weather:
   kind: rain
   label: "Hot, storms pm"
   hi: "34°"
-cover: rainclay
+cover: mangrove
 picks:
   - no: 1
     name: "AirAsia HYROX Jakarta"
@@ -16,60 +16,73 @@ picks:
     date: "27–28 June 2026"
     budget: "Spectator ticket varies"
   - no: 2
+    name: "Ancol Sunset Sound"
+    area: "North"
+    date: "27 June 2026"
+    budget: "Ticket + food; check Ancol"
+  - no: 3
+    name: "Museum MACAN exhibitions"
+    area: "West"
+    date: "23 May–4 Oct 2026; on this weekend"
+    budget: "Museum ticket + workshop if booked"
+  - no: 4
     name: "Jakarta Fair Kemayoran"
     area: "Central"
-    date: "On this weekend; official site lists 2026 fair programming"
+    date: "On this weekend; check daily lineup"
     budget: "Paid entry + snacks/shopping"
-  - no: 3
-    name: "Ancol seaside loop"
-    area: "North"
-    date: "Available this weekend; check same-day promos/events"
-    budget: "Rp 35k+ entry, more for attractions"
-  - no: 4
+  - no: 5
     name: "Ragunan green morning"
     area: "South"
-    date: "Available this weekend; check opening before leaving"
-    budget: "Low entry + transport/snacks"
+    date: "Open Tue–Sun; on this weekend"
+    budget: "Rp 4k+ entry, more for extras"
 ---
 
-**Weekend of June 27–28.** It looks hot and a little moody, so you two should plan like Jakarta might suddenly say, “surprise, thunderstorm.” Pick one real anchor, keep the rest flexible, and double-check official pages or latest posts before heading out because hours, prices, and ticket details can move fast.
+**Weekend of June 27–28.** Jakarta looks like it wants to be hot first and dramatic later, so you two should keep the outdoor bits early or golden-hour and save the indoor plans for backup. Pick one ticketed anchor, keep snacks flexible, and double-check official pages before leaving because lineups, hours, and prices love doing tiny plot twists.
 
 ## 1. AirAsia HYROX Jakarta
 **Date:** 27–28 June 2026
 **Area:** North — NICE PIK 2, Pantai Indah Kapuk 2
-**Why go:** A big indoor fitness-race weekend with running, workout stations, doubles, relay, and plenty of “maybe we should train again” energy. It is the most date-specific and rain-safe pick if you two want something lively without gambling on the weather.
+**Why go:** This is the big sweat-and-cheer anchor: HYROX lands with running, workout stations, doubles, relay, and lots of “we should totally train again” energy. Even if you two only spectate, it is lively, highly date-specific, and safely indoors if the sky starts acting expensive.
 **Rough budget:** Spectator ticket varies
-**Weather:** Fully indoor-friendly, so this is the safest anchor if the afternoon turns stormy.
+**Weather:** Best storm-proof plan of the weekend; stay for the action, not the traffic drama.
 **Source:** [HYROX official event page](https://hyrox.com/event/hyrox-jakarta/)
 
-## 2. Jakarta Fair Kemayoran
-**Date:** On this weekend; official site lists 2026 fair programming
+## 2. Ancol Sunset Sound
+**Date:** 27 June 2026
+**Area:** North — Ancol beach area
+**Why go:** A seaside sunset plan with live music, food, and that “let’s pretend Jakarta is chill” beachy glow. The June edition lists Glizcoustic and Guyon Waton, so go for sing-along energy, then bail gracefully if clouds roll in.
+**Rough budget:** Ticket + food; check Ancol
+**Weather:** Make it a late-afternoon call; brilliant if clear, very skippable if the radar looks grumpy.
+**Source:** [Ancol Sunset Sound official listing](https://www.ancol.com/acara/ancol-sunset-sound-2026-hadirkan-guyon-waton-glizcoustic-ndarboy-dan-mr-jono-joni--326)
+
+## 3. Museum MACAN exhibitions
+**Date:** 23 May–4 Oct 2026; on this weekend
+**Area:** West — Museum MACAN, Kebon Jeruk
+**Why go:** The clean indoor reset: Riar Rizaldi, Marcos Kueh, Dawn Ng, landscape-focused works, and a 28 June workshop on the program slate. It is the best “we still went out, but we also protected our serotonin” pick.
+**Rough budget:** Museum ticket + workshop if booked
+**Weather:** Ideal for the hottest or rainiest part of the day; book ahead if you want the workshop.
+**Source:** [Museum MACAN official program page](https://www.museummacan.org/)
+
+## 4. Jakarta Fair Kemayoran
+**Date:** On this weekend; check daily lineup
 **Area:** Central — JIExpo Kemayoran
-**Why go:** The big Jakarta birthday-season fair: food, shopping, concert energy, bright booths, and that chaotic-fun PRJ feeling. Go when you two want an easy evening where the whole plan can be “walk, snack, browse, escape before tired turns grumpy.”
+**Why go:** When you two want Jakarta chaos in one place: snacks, shopping, lights, wandering, and a very real chance of buying something silly but useful. Treat it like an evening snack safari and check the current concert/ticket page before committing.
 **Rough budget:** Paid entry + snacks/shopping
-**Weather:** Better later in the day after the worst heat, but expect some outdoor movement between halls.
+**Weather:** Better after the worst heat, but keep an umbrella because moving between halls can still get splashy.
 **Source:** [Jakarta Fair official site](https://www.jakartafair.co.id/)
 
-## 3. Ancol seaside loop
-**Date:** Available this weekend; check same-day promos/events
-**Area:** North — Ancol / Pasar Seni / beach area
-**Why go:** A breezy, choose-your-own-adventure north-side date: sunset, Pasar Seni, casual food, or one paid attraction if you two want more structure. Keep it light and playful rather than trying to conquer all of Ancol.
-**Rough budget:** Rp 35k+ entry, more for attractions
-**Weather:** Aim for morning or late afternoon; skip the beachy parts if rain clouds start stacking up.
-**Source:** [Ancol official site](https://www.ancol.com/)
-
-## 4. Ragunan green morning
-**Date:** Available this weekend; check opening before leaving
-**Area:** South — Taman Margasatwa Ragunan
-**Why go:** A soft, leafy morning reset before the city gets too hot. You two can make it simple: walk a little, see a few zones, grab snacks, then leave before the afternoon weather gets dramatic.
-**Rough budget:** Low entry + transport/snacks
-**Weather:** Make this a morning plan; do not turn it into a long outdoor day.
-**Source:** [Ragunan official site](https://ragunanzoo.jakarta.go.id/language/en/)
+## 5. Ragunan green morning
+**Date:** Open Tue–Sun; on this weekend
+**Area:** South — Taman Margasatwa Ragunan, Pasar Minggu
+**Why go:** Low-cost, leafy, and sweet if you two start early. Do a short loop, visit a few favorites, grab snacks, and leave before the afternoon turns into a sauna with thunder sound effects.
+**Rough budget:** Rp 4k+ entry, more for extras
+**Weather:** Morning only; shade helps, but the heat will still win if you linger too long.
+**Source:** [Ragunan ticket information](https://ragunanzoo.jakarta.go.id/ticket/)
 
 ## If you only do three things
-1. **HYROX** — most rain-safe and actually dated to this weekend.
-2. **Jakarta Fair** — best all-in-one Jakarta weekend chaos.
-3. **Ragunan** — sweetest low-cost morning before the heat wins.
+1. **HYROX** — strongest date-specific anchor and safest if it rains.
+2. **Museum MACAN** — cool, indoor, and genuinely on for this weekend.
+3. **Ancol Sunset Sound** — best playful payoff if Saturday’s sky behaves.
 
 ---
 
