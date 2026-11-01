@@ -9,6 +9,8 @@ weather:
   label: "Hot, storms pm"
   hi: "34°"
 cover: mangrove
+bestWindow: "Mornings and golden hour · indoors after"
+rainPlan: "HYROX at NICE PIK 2 — the storm-proof plan"
 picks:
   - no: 1
     name: "AirAsia HYROX Jakarta"

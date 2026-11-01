@@ -21,9 +21,13 @@ const issues = defineCollection({
       hi: z.string(),
     }),
     cover: z.enum(['sunwheat', 'rainclay', 'heritage', 'mangrove']),
-    // Only the fields the site actually renders. The full prose for each pick
-    // (place, why, the top-3 list) lives in the Markdown body, which is the
-    // source of truth for the detail page.
+    // Optional short lines for the plan page's "at a glance" card.
+    bestWindow: z.string().optional(), // e.g. "Sat late afternoon · Sun morning"
+    rainPlan: z.string().optional(), // e.g. "Museum MACAN — fully indoors"
+
+    // Picks power the home stop rows, the area chips and the archive rows. The
+    // per-stop prose (place, why, weather, source) and the top-three list come
+    // from the Markdown body, which src/lib/plan.ts parses.
     picks: z
       .array(
         z.object({

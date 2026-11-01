@@ -1,180 +1,344 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import AtAGlance from '../../components/AtAGlance.astro';
+import StopPicker from '../../components/StopPicker.astro';
+import TopThree from '../../components/TopThree.astro';
 import Weather from '../../components/Weather.astro';
-import { uniqueAreas, issueNumbers, withBase } from '../../lib/theme';
+import { areaTextColor, issueNumbers, uniqueAreas, withBase } from '../../lib/theme';
+import { parsePlan, renderInline } from '../../lib/plan';
 
 export async function getStaticPaths() {
   const issues = await getCollection('issues');
   const numbers = issueNumbers(issues.map((i) => i.id));
-  return issues.map((issue) => ({
+  const sorted = [...issues].sort((a, b) => numbers.get(a.id)! - numbers.get(b.id)!);
+  return sorted.map((issue, index) => ({
     params: { slug: issue.id },
-    props: { issue, no: numbers.get(issue.id)! },
+    props: {
+      issue,
+      no: numbers.get(issue.id)!,
+      prev: index > 0 ? sorted[index - 1] : null,
+      next: index < sorted.length - 1 ? sorted[index + 1] : null,
+    },
   }));
 }
 
-const { issue, no } = Astro.props;
+const { issue, no, prev, next } = Astro.props;
 const { Content } = await render(issue);
-const areaTags = uniqueAreas(issue.data.picks);
+
+// The body is the authoring format documented in the README; when a file does
+// not follow it, the page falls back to rendering the article as-is.
+const plan = parsePlan(issue.body);
+const picks = issue.data.picks;
+const structured = plan.ok && plan.stops.length === picks.length;
+
+if (!structured && picks.length > 0) {
+  console.warn(
+    `[plan] ${issue.id}: body does not match the stop format (stops ${plan.stops.length}/${picks.length}); rendering the article instead.`,
+  );
+}
+
+// Frontmatter picks stay the single source for "when" and "budget"; flag a body
+// that disagrees so the two views can never drift apart silently.
+for (const pick of picks) {
+  const detail = plan.stops.find((stop) => stop.no === pick.no);
+  if (detail?.date && detail.date !== pick.date) {
+    console.warn(`[plan] ${issue.id} stop ${pick.no}: body date "${detail.date}" differs from picks date "${pick.date}".`);
+  }
+  if (detail?.budget && detail.budget !== pick.budget) {
+    console.warn(`[plan] ${issue.id} stop ${pick.no}: body budget "${detail.budget}" differs from picks budget "${pick.budget}".`);
+  }
+}
+
+const stops = picks.map((pick) => {
+  const detail = plan.stops.find((stop) => stop.no === pick.no);
+  return {
+    no: pick.no,
+    name: pick.name,
+    area: pick.area,
+    date: pick.date,
+    place: detail?.place,
+    budget: pick.budget,
+    why: detail?.why,
+    weather: detail?.weather,
+    source: detail?.source,
+  };
+});
+
+const areas = uniqueAreas(picks);
 ---
 <Base title={`${issue.data.title} · Our Weekend Plans`} description={issue.data.teaser}>
-  <div class="detail">
-    <article class="article-wrap">
-      <a class="back-link" href={withBase('/')}>
-        <span class="back-link__arrow">←</span> All our plans
-      </a>
+  <SiteHeader variant="plan" label={`No. ${no} · ${issue.data.dateRange}`} />
+  <main class="plan">
+    <header class="plan__head">
+      <p class="eyebrow">No. {no} · {issue.data.dateLong}</p>
+      <h1 class="plan__title">{issue.data.title}</h1>
+      <p class="lede">{issue.data.teaser}</p>
+      <ul class="chips">
+        <li class="chip">
+          <Weather kind={issue.data.weather.kind} color="#332B22" size={15} />
+          {issue.data.weather.label} · {issue.data.weather.hi}
+        </li>
+        {areas.map((area) => (
+          <li class="chip chip--area" style={`color:${areaTextColor(area)}`}>{area}</li>
+        ))}
+      </ul>
+    </header>
 
-      <div class="masthead">
-        <div class="masthead__meta">
-          <span>Plan No. {no}</span>
-          <span class="masthead__slash">/</span>
-          <span class="masthead__date">{issue.data.dateLong}</span>
-        </div>
-        <h1 class="title">{issue.data.title}</h1>
-        <p class="teaser">{issue.data.teaser}</p>
-        <div class="tags">
-          <span class="tag tag--weather">
-            <Weather kind={issue.data.weather.kind} color="#332B22" size={16} />
-            {issue.data.weather.label}
-          </span>
-          {areaTags.map((t) => (
-            <span class="tag tag--area" style={`color:${t.color};border-color:${t.color}`}>
-              {t.name}
-            </span>
+    {structured ? (
+      <div class="plan__body">
+        <StopPicker stops={stops} />
+        <div class="plan__main">
+          <AtAGlance
+            stops={stops.length}
+            areas={areas}
+            weather={issue.data.weather}
+            bestWindow={issue.data.bestWindow}
+            rainPlan={issue.data.rainPlan}
+          />
+
+          {plan.intro && <p class="plan__intro" set:html={renderInline(plan.intro)} />}
+
+          {stops.map((stop) => (
+            <section class="stop" id={`stop-${stop.no}`} aria-labelledby={`stop-${stop.no}-title`}>
+              <div class="stop__head">
+                <span class="stop__no" style={`color:${areaTextColor(stop.area)}`} aria-hidden="true">{stop.no}</span>
+                <h2 class="stop__title" id={`stop-${stop.no}-title`}>{stop.name}</h2>
+              </div>
+
+              <dl class="facts">
+                <div class="fact">
+                  <dt class="fact__k">When</dt>
+                  <dd class="fact__v">{stop.date}</dd>
+                </div>
+                <div class="fact">
+                  <dt class="fact__k">Where</dt>
+                  <dd class="fact__v">{stop.place ? `${stop.area} — ${stop.place}` : stop.area}</dd>
+                </div>
+                <div class="fact">
+                  <dt class="fact__k">Budget</dt>
+                  <dd class="fact__v">{stop.budget}</dd>
+                </div>
+                {stop.weather && (
+                  <div class="fact">
+                    <dt class="fact__k">Weather</dt>
+                    <dd class="fact__v">{stop.weather}</dd>
+                  </div>
+                )}
+              </dl>
+
+              {stop.why && <p class="why">{stop.why}</p>}
+
+              {stop.source && (
+                <a class="src" href={stop.source.url} target="_blank" rel="noopener noreferrer">
+                  {stop.source.label} <span aria-hidden="true">↗</span>
+                </a>
+              )}
+            </section>
           ))}
+
+          <TopThree items={plan.topNotes} />
         </div>
       </div>
-
-      <div class="rule"></div>
-
-      <div class="article">
-        <Content />
+    ) : (
+      <div class="plan__body plan__body--article">
+        <article class="article"><Content /></article>
       </div>
+    )}
 
-      <footer class="footer">
-        <span class="footer__sign">That's the plan, you two. Go make a thing of it. 💛</span>
-        <a class="footer__btn" href={withBase('/')}>All our plans</a>
-      </footer>
-    </article>
-  </div>
+    <nav class="plan__foot" aria-label="Other weekends">
+      {prev ? (
+        <a class="foot-link" href={withBase(`issues/${prev.id}/`)}>
+          <span aria-hidden="true">←</span> {prev.data.dateRange} · {prev.data.title}
+        </a>
+      ) : (
+        <span></span>
+      )}
+      {next ? (
+        <a class="foot-link" href={withBase(`issues/${next.id}/`)}>
+          {next.data.dateRange} · {next.data.title} <span aria-hidden="true">→</span>
+        </a>
+      ) : (
+        <a class="foot-link" href={withBase('/')}>All plans <span aria-hidden="true">→</span></a>
+      )}
+    </nav>
+  </main>
+  <SiteFooter />
 </Base>
 
 <style>
-  .detail {
-    background: var(--paper);
-    min-height: 100vh;
-    padding-bottom: 120px;
-    animation: gmRise 0.5s var(--ease-out) both;
-  }
-  .article-wrap {
-    max-width: 880px;
+  .plan { background: var(--paper); color: var(--ink); }
+
+  .plan__head {
+    max-width: 1240px;
     margin: 0 auto;
-    padding: 28px clamp(20px, 5vw, 40px) 0;
+    padding: clamp(26px, 4vw, 42px) clamp(20px, 5vw, 64px) clamp(20px, 3vw, 28px);
   }
-  .back-link {
-    background: none;
-    border: none;
+  .eyebrow {
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+  .plan__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(32px, 5vw, 58px);
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+  }
+  .lede {
+    margin: 16px 0 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(17px, 1.7vw, 21px);
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 52ch;
+  }
+  .chips {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 18px 0 0;
+    padding: 0;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--cream);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #332b22;
+  }
+  .chip--area { background: transparent; border-color: currentColor; }
+
+  /* ─── body: sticky stop picker + content ─── */
+  .plan__body {
+    --gutter: clamp(20px, 5vw, 64px);
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 var(--gutter) clamp(36px, 5vw, 64px);
+    display: grid;
+    grid-template-columns: 268px minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 56px);
+    align-items: start;
+  }
+  .plan__body--article { display: block; max-width: 900px; }
+
+  .plan__intro {
+    margin: 24px 0 6px;
+    font-family: var(--font-serif);
+    font-size: clamp(17px, 1.6vw, 19px);
+    line-height: 1.7;
+    color: #332b22;
+  }
+
+  /* ─── one stop ─── */
+  .stop {
+    border-top: 1px solid var(--rule);
+    padding: clamp(22px, 3vw, 30px) 0 clamp(24px, 3vw, 32px);
+    scroll-margin-top: 24px;
+  }
+  .stop:first-of-type { border-top: 1.5px solid var(--ink); }
+  .stop__head { display: flex; align-items: baseline; gap: 14px; }
+  .stop__no {
+    flex: none;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(22px, 2.6vw, 30px);
+    line-height: 1;
+  }
+  .stop__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(21px, 2.4vw, 29px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px clamp(20px, 3vw, 32px);
+    margin: 18px 0 0;
+  }
+  .fact__k {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--rust);
-    text-decoration: none;
-    padding: 8px 0;
+    color: var(--muted);
+  }
+  .fact__v {
+    margin: 3px 0 0;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.45;
+    color: #2e2820;
+  }
+  .why {
+    margin: 18px 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(17px, 1.6vw, 18px);
+    line-height: 1.65;
+    color: #332b22;
+    max-width: 68ch;
+  }
+  .src {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-  }
-  .back-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .back-link__arrow { font-size: 16px; }
-
-  .masthead {
-    border-top: 1.5px solid var(--ink);
-    margin-top: 8px;
-    padding-top: 24px;
-  }
-  .masthead__meta {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--rust);
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-  .masthead__slash { color: #C6BCAB; }
-  .masthead__date { color: var(--taupe); }
-  .title {
-    margin: 14px 0 0;
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: clamp(32px, 5.5vw, 60px);
-    line-height: 0.96;
-    letter-spacing: -0.025em;
-  }
-  .teaser {
-    margin: 16px 0 0;
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: clamp(17px, 2vw, 22px);
-    line-height: 1.4;
-    color: var(--taupe);
-    max-width: 42ch;
-  }
-  .tags {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 22px;
-    align-items: center;
-  }
-  .tag {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    border-radius: 999px;
-    padding: 7px 13px;
-  }
-  .tag--weather {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: #332B22;
-    background: var(--cream);
-    border: 1px solid var(--rule);
-  }
-  .tag--area { border: 1px solid currentColor; }
-
-  .rule { height: 1px; background: var(--rule); margin: 30px 0; }
-
-  .footer {
-    border-top: 1.5px solid var(--ink);
-    margin: 48px 0 0;
-    padding: 24px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .footer__sign {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 17px;
-    color: var(--taupe);
-  }
-  .footer__btn {
-    background: none;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 9px 16px;
     border: 1.5px solid var(--ink);
     border-radius: 999px;
-    padding: 12px 22px;
     font-family: var(--font-sans);
-    font-weight: 600;
     font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
     text-decoration: none;
     transition: background 0.2s, color 0.2s;
   }
-  .footer__btn:hover { background: var(--ink); color: var(--cream); }
+  .src:hover { background: var(--ink); color: var(--cream); }
+
+  /* ─── previous / next weekend ─── */
+  .plan__foot {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 20px clamp(20px, 5vw, 64px);
+    border-top: 1.5px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .foot-link {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--rust);
+    text-decoration: none;
+  }
+  .foot-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (max-width: 1000px) {
+    .plan__body { display: block; }
+    .plan__main { padding-top: 18px; }
+    .stop { scroll-margin-top: 76px; }
+    .facts { grid-template-columns: 1fr; gap: 12px; }
+  }
 </style>

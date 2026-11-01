@@ -1,0 +1,174 @@
+---
+interface Props {
+  stops: { no: number; name: string }[];
+}
+const { stops } = Astro.props;
+---
+<nav class="picker" aria-label="Stops in this plan">
+  <p class="picker__label">In this plan</p>
+  <ol class="picker__list">
+    {stops.map((stop) => (
+      <li class="picker__item">
+        <a class="picker__link" href={`#stop-${stop.no}`}>
+          <span class="picker__no">{stop.no}</span>
+          <span class="picker__name">{stop.name}</span>
+        </a>
+      </li>
+    ))}
+    <li class="picker__item">
+      <a class="picker__link" href="#top-three">
+        <span class="picker__no" aria-hidden="true">✦</span>
+        <span class="picker__name">If you only do three things</span>
+      </a>
+    </li>
+  </ol>
+</nav>
+
+<script is:inline>
+  // Marks the stop you are reading. Reads the section whose top has passed a
+  // "reading line" rather than the topmost visible one, so a tall stop that
+  // still peeks over the fold cannot win over the stop actually on screen.
+  document.addEventListener('DOMContentLoaded', function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.picker__link'));
+    var targets = links
+      .map(function (link) {
+        var href = link.getAttribute('href') || '';
+        return href.charAt(0) === '#' ? document.querySelector(href) : null;
+      })
+      .filter(Boolean);
+
+    if (!links.length || !targets.length) return;
+
+    var list = document.querySelector('.picker__list');
+    var narrow = window.matchMedia('(max-width: 1000px)');
+    var current = null;
+
+    var centerChip = function (link) {
+      if (!narrow.matches || !list || !list.scrollTo) return;
+      var listBox = list.getBoundingClientRect();
+      var chipBox = link.getBoundingClientRect();
+      var target = list.scrollLeft + (chipBox.left - listBox.left) - (list.clientWidth - chipBox.width) / 2;
+      list.scrollTo({ left: target, behavior: 'smooth' });
+    };
+
+    var setCurrent = function (id) {
+      if (id === current) return;
+      current = id;
+      links.forEach(function (link) {
+        var on = id !== null && link.getAttribute('href') === '#' + id;
+        link.classList.toggle('is-current', on);
+        if (on) {
+          link.setAttribute('aria-current', 'true');
+          centerChip(link);
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    };
+
+    var update = function () {
+      var line = window.innerHeight * 0.35;
+      var active = null;
+      for (var i = 0; i < targets.length; i += 1) {
+        if (targets[i].getBoundingClientRect().top <= line) active = targets[i].id;
+      }
+      setCurrent(active);
+    };
+
+    var ticking = false;
+    var request = function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        ticking = false;
+        update();
+      });
+    };
+
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    update();
+  });
+</script>
+
+<style>
+  .picker { position: sticky; top: 24px; }
+
+  .picker__label {
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+  .picker__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .picker__link {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 11px 0 11px 12px;
+    border-bottom: 1px solid var(--rule);
+    border-left: 3px solid transparent;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.35;
+    color: #3a332a;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .picker__link:hover { color: var(--ink); }
+  .picker__link.is-current {
+    border-left-color: var(--rust);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .picker__no {
+    flex: none;
+    min-width: 16px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--rust);
+  }
+
+  /* Narrow screens: a sticky, horizontally scrolling stop picker. */
+  @media (max-width: 1000px) {
+    .picker {
+      top: 0;
+      z-index: 20;
+      margin: 0 calc(-1 * var(--gutter, clamp(20px, 5vw, 64px)));
+      padding: 8px var(--gutter, clamp(20px, 5vw, 64px));
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+    }
+    .picker__label { display: none; }
+    .picker__list {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border: 0;
+      padding: 2px 0;
+      scrollbar-width: none;
+    }
+    .picker__list::-webkit-scrollbar { display: none; }
+    .picker__link {
+      flex: none;
+      padding: 7px 12px;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .picker__link.is-current {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--cream);
+    }
+    .picker__link.is-current .picker__no { color: var(--cream); }
+  }
+</style>

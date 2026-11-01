@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wireframe — mobile</title>
+    <link rel="stylesheet" href="wireframe.css" />
+  </head>
+  <body class="sheet sheet--mobile">
+    <!-- ══════════════════════════════════════════════════════════
+         C · HOME — mobile. Same order as desktop, but the plan starts
+         in the first screen: no cover art before it.
+         ══════════════════════════════════════════════════════════ -->
+    <section class="shot" data-name="home-mobile">
+      <div class="shot__label">C · Home — mobile <span>390px · first screen leads with the plan</span></div>
+
+      <div class="frame frame--mobile">
+        <div class="bar">
+          <div class="wordmark">Our Weekend Plans</div>
+          <nav class="nav"><span class="off">Past ↓</span></nav>
+        </div>
+
+        <div class="hero">
+          <div class="eyebrow">No. 13 · Jul 11–12, 2026</div>
+          <h1 class="h1">Last Call in the Heat</h1>
+          <p class="lede">
+            A warm, cloud-soft weekend for you two: one big fair finale, one cool art hideout, and
+            two easy outdoor windows if the sky behaves.
+          </p>
+          <div class="chips">
+            <span class="chip">Hot, clouds pm · 33°</span>
+            <span class="chip">4 stops</span>
+            <span class="chip">North · West · South</span>
+          </div>
+          <div class="actions anchor">
+            <span class="pin">1</span>
+            <span class="btn btn--primary btn--block">Open the full plan →</span>
+            <span class="textlink">Jump to the stops ↓</span>
+          </div>
+        </div>
+
+        <div class="mglance">
+          <div>
+            <div class="glance__k">Stops</div>
+            <div class="glance__v">4</div>
+          </div>
+          <div>
+            <div class="glance__k">Areas</div>
+            <div class="glance__v">3</div>
+          </div>
+          <div>
+            <div class="glance__k">Weather</div>
+            <div class="glance__v">33° · clouds</div>
+          </div>
+        </div>
+
+        <section class="band">
+          <div class="band__head">
+            <h2 class="h2">This weekend’s plan</h2>
+            <span class="hint">Each stop opens its own section →</span>
+          </div>
+          <div class="anchor">
+            <span class="pin">2</span>
+            <ol class="stops">
+              <li class="stop">
+                <span class="stop__no">1</span>
+                <span class="stop__body">
+                  <span class="stop__name">Jakarta Fair final-weekend concerts</span>
+                  <span class="stop__meta">North · 11–12 July · Paid entry + snacks</span>
+                </span>
+                <span class="stop__go">→</span>
+              </li>
+              <li class="stop">
+                <span class="stop__no">2</span>
+                <span class="stop__body">
+                  <span class="stop__name">Museum MACAN exhibition stack</span>
+                  <span class="stop__meta">West · on this weekend · Museum ticket</span>
+                </span>
+                <span class="stop__go">→</span>
+              </li>
+              <li class="stop">
+                <span class="stop__no">3</span>
+                <span class="stop__body">
+                  <span class="stop__name">Ancol seaside and mini-attraction loop</span>
+                  <span class="stop__meta">North · 11–12 July · Rp 35k+ entry</span>
+                </span>
+                <span class="stop__go">→</span>
+              </li>
+              <li class="stop">
+                <span class="stop__no">4</span>
+                <span class="stop__body">
+                  <span class="stop__name">Ragunan green morning</span>
+                  <span class="stop__meta">South · Tue–Sun · Low entry + snacks</span>
+                </span>
+                <span class="stop__go">→</span>
+              </li>
+            </ol>
+          </div>
+
+          <div class="callout anchor">
+            <span class="pin">3</span>
+            <h3 class="callout__title">If you only do three things</h3>
+            <ol class="callout__list">
+              <li>Jakarta Fair — the date-specific, snack-heavy anchor.</li>
+              <li>Museum MACAN — the safe cool-down if it rains.</li>
+              <li>Ancol seaside — the playful outdoors if the sky behaves.</li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="band__head">
+            <h2 class="h2">Past weekends</h2>
+            <span class="hint">3 weekends so far</span>
+          </div>
+          <div class="archive">
+            <div class="archive__row">
+              <span class="archive__date">Jul 4–5</span>
+              <span class="archive__name">Hot City Hideouts</span>
+              <span class="stop__go">→</span>
+            </div>
+            <div class="archive__row">
+              <span class="archive__date">Jun 27–28</span>
+              <span class="archive__name">Raincheck with a Spark</span>
+              <span class="stop__go">→</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="foot">
+          <span>A love note with logistics · Jakarta</span>
+          <span>All plans →</span>
+        </div>
+        <div class="stamp">Wireframe — structure only; colours and type follow the current design.</div>
+      </div>
+
+      <ol class="legend">
+        <li><b>1</b>The plan starts in the first screen: facts, then one primary action.</li>
+        <li>
+          <b>2</b>Stops are 90px rows the whole width of the screen, so each is an easy tap target;
+          they open their own section.
+        </li>
+        <li><b>3</b>“If you only do three things” stays next to the plan, so the decision is on screen here.</li>
+      </ol>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         D · PLAN DETAIL — mobile. Facts first in every stop, sticky
+         stop picker, previous-weekend link at the end.
+         ══════════════════════════════════════════════════════════ -->
+    <section class="shot" data-name="plan-mobile">
+      <div class="shot__label">D · Plan detail — mobile <span>390px · one weekend in full</span></div>
+
+      <div class="frame frame--mobile">
+        <div class="bar">
+          <span class="textlink" style="text-align: left">← All plans</span>
+          <div class="wordmark">Our Weekend Plans</div>
+        </div>
+
+        <div class="plan-head">
+          <div class="eyebrow">No. 13 · July 11–12, 2026</div>
+          <h1 class="h1">Last Call in the Heat</h1>
+          <p class="lede">
+            A warm, cloud-soft weekend for you two: one big fair finale, one cool art hideout, and
+            two easy outdoor windows if the sky behaves.
+          </p>
+          <div class="chips">
+            <span class="chip">Hot, clouds pm · 33°</span>
+            <span class="chip">North</span>
+            <span class="chip">West</span>
+            <span class="chip">South</span>
+          </div>
+        </div>
+
+        <div class="stopbar anchor">
+          <span class="pin pin--top">2</span>
+          <span class="sbchip sbchip--on">1 Fair</span>
+          <span class="sbchip">2 MACAN</span>
+          <span class="sbchip">3 Ancol</span>
+          <span class="sbchip">4 Ragunan</span>
+          <span class="stopbar__edge">›</span>
+        </div>
+
+        <div class="plan-body">
+          <div class="glance anchor">
+            <span class="pin">1</span>
+            <div>
+              <div class="glance__k">Stops</div>
+              <div class="glance__v">4</div>
+            </div>
+            <div>
+              <div class="glance__k">Areas</div>
+              <div class="glance__v">North · West · South</div>
+            </div>
+            <div>
+              <div class="glance__k">Budget</div>
+              <div class="glance__v">Paid → low entry</div>
+            </div>
+            <div>
+              <div class="glance__k">Best window</div>
+              <div class="glance__v">Sat pm · Sun am</div>
+            </div>
+            <div class="glance__wide">
+              <div class="glance__k">If the sky turns</div>
+              <div class="glance__v">Museum MACAN — fully indoors</div>
+            </div>
+          </div>
+
+          <p class="intro">
+            Keep the plan cute, shaded and easy to bail from if the clouds get dramatic. Make the
+            Fair or MACAN the anchor, then keep Ancol or Ragunan as the “only if we wake up with
+            energy” option.
+          </p>
+
+          <div class="anchor">
+            <span class="pin">3</span>
+            <section class="stopcard">
+              <div class="stopcard__head">
+                <span class="stop__no">1</span>
+                <h2 class="h2">Jakarta Fair final-weekend concerts</h2>
+              </div>
+              <div class="facts">
+                <div><div class="fact__k">When</div><div class="fact__v">11–12 July · check daily lineup</div></div>
+                <div><div class="fact__k">Where</div><div class="fact__v">North — JIExpo Kemayoran</div></div>
+                <div><div class="fact__k">Budget</div><div class="fact__v">Paid entry + snacks</div></div>
+                <div><div class="fact__k">Weather</div><div class="fact__v">Late afternoon → evening</div></div>
+              </div>
+              <p class="why">
+                The fair’s last stretch: Juicy Luicy on Saturday night, NDX AXA on Sunday, plus
+                snack-shopping chaos. Go hungry and let the fair be the plan.
+              </p>
+              <span class="src">Jakarta Fair site ↗</span>
+            </section>
+
+            <section class="stopcard">
+              <div class="stopcard__head">
+                <span class="stop__no">2</span>
+                <h2 class="h2">Museum MACAN exhibition stack</h2>
+              </div>
+              <div class="facts">
+                <div><div class="fact__k">When</div><div class="fact__v">13 Jun–4 Oct · on this weekend</div></div>
+                <div><div class="fact__k">Where</div><div class="fact__v">West — Kebon Jeruk</div></div>
+                <div><div class="fact__k">Budget</div><div class="fact__v">Museum ticket</div></div>
+                <div><div class="fact__k">Weather</div><div class="fact__v">Indoor — safest rain shelter</div></div>
+              </div>
+              <p class="why">
+                A clean indoor reset: one ticket covers five shows, so wander, whisper hot takes, and
+                leave before museum brain turns mushy.
+              </p>
+              <span class="src">MACAN tickets ↗</span>
+            </section>
+
+            <section class="stopcard">
+              <div class="stopcard__head">
+                <span class="stop__no">3</span>
+                <h2 class="h2">Ancol seaside and mini-attraction loop</h2>
+              </div>
+              <div class="facts">
+                <div><div class="fact__k">When</div><div class="fact__v">11–12 July · check promos</div></div>
+                <div><div class="fact__k">Where</div><div class="fact__v">North — Ancol / Pasar Seni</div></div>
+                <div><div class="fact__k">Budget</div><div class="fact__v">Rp 35k+ entry</div></div>
+                <div><div class="fact__k">Weather</div><div class="fact__v">Morning or late afternoon</div></div>
+              </div>
+              <p class="why">
+                Beach walk, Pasar Seni, one attraction, one snack, one slow sunset attempt — not the
+                whole Ancol cinematic universe.
+              </p>
+              <span class="src">Ancol site ↗</span>
+            </section>
+
+            <section class="stopcard">
+              <div class="stopcard__head">
+                <span class="stop__no">4</span>
+                <h2 class="h2">Ragunan green morning</h2>
+              </div>
+              <div class="facts">
+                <div><div class="fact__k">When</div><div class="fact__v">11–12 July · Tue–Sun</div></div>
+                <div><div class="fact__k">Where</div><div class="fact__v">South — Pasar Minggu</div></div>
+                <div><div class="fact__k">Budget</div><div class="fact__v">Low entry + snacks</div></div>
+                <div><div class="fact__k">Weather</div><div class="fact__v">Morning only; bring water</div></div>
+              </div>
+              <p class="why">
+                A soft, leafy morning: a few animal zones, simple snacks, and leave while it still
+                feels like a cute date.
+              </p>
+              <span class="src">Ragunan site ↗</span>
+            </section>
+          </div>
+
+          <div class="callout">
+            <h3 class="callout__title">If you only do three things</h3>
+            <ol class="callout__list">
+              <li>Jakarta Fair — the date-specific anchor.</li>
+              <li>Museum MACAN — the safe cool-down if it rains.</li>
+              <li>Ancol seaside — the playful outdoors if the sky behaves.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="plan-foot">
+          <span>← Jul 4–5 · Hot City Hideouts</span>
+          <span>All plans →</span>
+        </div>
+        <div class="stamp">Wireframe — structure only; colours and type follow the current design.</div>
+      </div>
+
+      <ol class="legend">
+        <li><b>1</b>Same at-a-glance summary as desktop, directly under the title.</li>
+        <li><b>2</b>Sticky stop picker under the title; it follows you down the plan.</li>
+        <li><b>3</b>Every stop shows when / where / budget / weather first, then the reason to go.</li>
+      </ol>
+    </section>
+  </body>
+</html>

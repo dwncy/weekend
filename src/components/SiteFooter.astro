@@ -1,0 +1,37 @@
+---
+import { withBase } from '../lib/theme';
+---
+<footer class="foot">
+  <div class="foot__wrap">
+    <span class="foot__sign">A love note with logistics · Jakarta</span>
+    <a class="foot__link" href={withBase('/')}>All plans <span aria-hidden="true">→</span></a>
+  </div>
+</footer>
+
+<style>
+  .foot { border-top: 1.5px solid var(--ink); background: var(--paper); }
+  .foot__wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 20px clamp(20px, 5vw, 64px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .foot__sign {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .foot__link {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rust);
+    text-decoration: none;
+  }
+  .foot__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+</style>

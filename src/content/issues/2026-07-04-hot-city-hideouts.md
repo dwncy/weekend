@@ -9,6 +9,8 @@ weather:
   label: "Hot, showers pm"
   hi: "33°"
 cover: heritage
+bestWindow: "Cloudy afternoon–evening · Sunday morning"
+rainPlan: "Museum MACAN or the fair halls — both indoors"
 picks:
   - no: 1
     name: "Jakarta Fair Kemayoran"

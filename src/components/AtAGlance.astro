@@ -1,0 +1,85 @@
+---
+import Weather from './Weather.astro';
+
+interface Props {
+  stops: number;
+  areas: string[];
+  weather: { kind: 'sun' | 'rain' | 'cloud'; label: string; hi: string };
+  bestWindow?: string;
+  rainPlan?: string;
+}
+
+const { stops, areas, weather, bestWindow, rainPlan } = Astro.props;
+---
+<section class="glance" aria-labelledby="glance-title">
+  <h2 class="glance__title" id="glance-title">At a glance</h2>
+  <div class="glance__grid">
+    <div class="glance__item">
+      <p class="glance__k">Stops</p>
+      <p class="glance__v">{stops}, in this order</p>
+    </div>
+    <div class="glance__item">
+      <p class="glance__k">Areas</p>
+      <p class="glance__v">{areas.join(' · ')}</p>
+    </div>
+    {bestWindow && (
+      <div class="glance__item">
+        <p class="glance__k">Best window</p>
+        <p class="glance__v">{bestWindow}</p>
+      </div>
+    )}
+    <div class="glance__item">
+      <p class="glance__k">Weather</p>
+      <p class="glance__v glance__weather">
+        <Weather kind={weather.kind} color="#332B22" size={16} />
+        <span>{weather.label} · {weather.hi}</span>
+      </p>
+    </div>
+    {rainPlan && (
+      <div class="glance__item glance__item--wide">
+        <p class="glance__k">If the sky turns</p>
+        <p class="glance__v">{rainPlan}</p>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .glance {
+    border: 1.5px solid var(--ink);
+    border-radius: 12px;
+    background: var(--cream);
+    padding: 18px clamp(16px, 2.4vw, 24px) 20px;
+  }
+  .glance__title {
+    margin: 0 0 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+  .glance__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 16px clamp(18px, 2.4vw, 28px);
+  }
+  .glance__item--wide { grid-column: 1 / -1; }
+  .glance__k {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .glance__v {
+    margin: 4px 0 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.45;
+    color: #2e2820;
+  }
+  .glance__weather { display: flex; align-items: center; gap: 7px; }
+</style>

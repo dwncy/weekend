@@ -1,9 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Marquee from '../components/Marquee.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import TopThree from '../components/TopThree.astro';
 import Weather from '../components/Weather.astro';
-import { cover, areaColor, marqueeItems, issueNumbers, withBase } from '../lib/theme';
+import { cover, areaTextColor, issueNumbers, uniqueAreas, withBase } from '../lib/theme';
+import { parsePlan } from '../lib/plan';
 
 const all = await getCollection('issues');
 const numbers = issueNumbers(all.map((i) => i.id));
@@ -15,261 +18,253 @@ const archive = issues.slice(1);
 const latestNo = latest ? numbers.get(latest.id)! : 0;
 const latestCover = latest ? cover(latest.data.cover) : null;
 const latestHref = latest ? withBase(`issues/${latest.id}/`) : withBase('/');
+
+// The plan body is parsed so the home page can show the top-three shortlist.
+const plan = latest ? parsePlan(latest.body) : null;
+const topNotes = plan?.ok ? plan.topNotes : [];
+const picks = latest?.data.picks ?? [];
+const areas = uniqueAreas(picks);
+
+function stopCount(count: number) {
+  return count === 1 ? '1 stop' : `${count} stops`;
+}
 ---
 <Base title="Our Weekend Plans">
-  <div class="page">
+  <SiteHeader variant="home" />
+  <main class="home">
     {!latest ? (
       <div class="empty">
-        <div class="kicker">A love note with logistics · Jakarta</div>
-        <h1 class="wordmark">Our Weekend<br />Plans</h1>
+        <p class="eyebrow">A love note with logistics · Jakarta</p>
+        <h1 class="empty__title">Our Weekend<br />Plans</h1>
         <p class="empty__note">No plans up yet — the next one lands this Friday. 💛</p>
       </div>
     ) : (
-    <>
-    <div class="marquee-bar">
-      <Marquee items={marqueeItems(latestNo, latest.data)} />
-    </div>
-
-    <div class="home">
-      <!-- masthead -->
-      <header class="masthead">
-        <div>
-          <div class="kicker">A love note with logistics · Jakarta</div>
-          <h1 class="wordmark">Our Weekend<br />Plans</h1>
-        </div>
-        <div class="masthead__meta">
-          <div>No. {latestNo}</div>
-          <div>{latest.data.dateRange}</div>
-          <div class="masthead__fresh">Fresh for you two 💛</div>
-        </div>
-      </header>
-      <div class="bleed"><div class="hr-ink"></div></div>
-
-      <!-- cover spread -->
-      <section class="spread">
-        <a
-          class="cover-tile"
-          href={latestHref}
-          style={`background:${latestCover.bg};color:${latestCover.fg}`}
-        >
-          <div class="cover-tile__grain"></div>
-          <div class="cover-tile__top">
-            <span>Plan No. {latestNo}</span>
-            <span>{latest.data.dateRange} · {latest.data.year}</span>
-          </div>
-          <div class="cover-tile__bottom">
-            <div class="cover-tile__weather">
-              <Weather kind={latest.data.weather.kind} color={latestCover.fg} size={17} />
-              <span>{latest.data.weather.label} · {latest.data.weather.hi}</span>
-            </div>
-            <h2 class="cover-tile__title">{latest.data.title}</h2>
-            <p class="cover-tile__teaser">{latest.data.teaser}</p>
-          </div>
-        </a>
-
-        <!-- contents -->
-        <div class="contents">
-          <div class="contents__eyebrow">The plan this weekend</div>
-          <div class="contents__sub">
-            a {latest.data.picks.length}-stop plan for the two of you
-          </div>
-          <ol class="contents__list">
-            {latest.data.picks.map((pick) => (
-              <li>
-                <a class="pick" href={latestHref}>
-                  <span class="pick__no" style={`color:${areaColor(pick.area)}`}>
-                    {pick.no}
-                  </span>
-                  <span class="pick__body">
-                    <span class="pick__name">{pick.name}</span>
-                    <span class="pick__meta">
-                      {pick.area} · {pick.date} · {pick.budget}
-                    </span>
-                  </span>
-                </a>
+      <>
+        <section class="hero">
+          <div class="hero__copy">
+            <p class="eyebrow">No. {latestNo} · {latest.data.dateRange}, {latest.data.year}</p>
+            <h1 class="title">{latest.data.title}</h1>
+            <p class="lede">{latest.data.teaser}</p>
+            <ul class="chips">
+              <li class="chip">
+                <Weather kind={latest.data.weather.kind} color="#332B22" size={15} />
+                {latest.data.weather.label} · {latest.data.weather.hi}
               </li>
-            ))}
-          </ol>
-          <a class="btn-read" href={latestHref}>
-            See the full plan <span class="btn-read__arrow">→</span>
-          </a>
-        </div>
-      </section>
-
-      <!-- back issues -->
-      <section class="back">
-        <div class="back__head">
-          <h3>Plans we've made</h3>
-          <span class="back__count">{archive.length} weekends planned &amp; counting</span>
-        </div>
-        <div class="back__grid">
-          {archive.map((iss) => {
-            const cv = cover(iss.data.cover);
-            return (
-              <a
-                class="issue-card"
-                href={withBase(`issues/${iss.id}/`)}
-                style={`background:${cv.bg};color:${cv.fg}`}
-              >
-                <div class="issue-card__grain"></div>
-                <div class="issue-card__top">
-                  <span>No. {numbers.get(iss.id)}</span>
-                  <span>{iss.data.dateRange}</span>
-                </div>
-                <div class="issue-card__bottom">
-                  <h4>{iss.data.title}</h4>
-                  <span class="issue-card__read">Relive it →</span>
-                </div>
+              <li class="chip">{stopCount(picks.length)}</li>
+              <li class="chip">{areas.join(' · ')}</li>
+            </ul>
+            <div class="actions">
+              <a class="btn btn--primary" href={latestHref}>
+                Open the full plan <span aria-hidden="true">→</span>
               </a>
-            );
-          })}
-        </div>
-      </section>
-    </div>
-    </>
+              <a class="btn btn--ghost" href="#stops">
+                Jump to the stops <span aria-hidden="true">↓</span>
+              </a>
+            </div>
+          </div>
+
+          <a
+            class="poster"
+            href={latestHref}
+            aria-label={`Read the full plan: ${latest.data.title}`}
+            style={`background:${latestCover!.bg};color:${latestCover!.fg}`}
+          >
+            <span class="poster__grain" aria-hidden="true"></span>
+            <span class="poster__top">
+              <span>Plan No. {latestNo}</span>
+              <span>{latest.data.dateRange} · {latest.data.year}</span>
+            </span>
+            <span class="poster__bottom">
+              <span class="poster__weather">
+                <Weather kind={latest.data.weather.kind} color={latestCover!.fg} size={16} />
+                {latest.data.dateRange} · {latest.data.weather.hi}
+              </span>
+              <span class="poster__title">{latest.data.title}</span>
+              <span class="poster__cue">Read the plan <span aria-hidden="true">→</span></span>
+            </span>
+          </a>
+        </section>
+
+        <section class="band" id="stops" aria-labelledby="stops-title">
+          <div class="wrap">
+            <div class="band__head">
+              <h2 class="band__title" id="stops-title">This weekend’s plan</h2>
+              <p class="band__hint">Each stop opens its own section</p>
+            </div>
+
+            <ol class="stops">
+              {picks.map((pick) => (
+                <li class="stop">
+                  <a class="stop__link" href={`${latestHref}#stop-${pick.no}`}>
+                    <span class="stop__no" style={`color:${areaTextColor(pick.area)}`}>{pick.no}</span>
+                    <span class="stop__body">
+                      <span class="stop__name">{pick.name}</span>
+                      <span class="stop__meta">
+                        {pick.area} · {pick.date} · {pick.budget}
+                      </span>
+                    </span>
+                    <span class="stop__go" aria-hidden="true">→</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+
+            {topNotes.length > 0 && <TopThree items={topNotes} />}
+          </div>
+        </section>
+
+        <section class="band" id="past" aria-labelledby="past-title">
+          <div class="wrap">
+            <div class="band__head">
+              <h2 class="band__title" id="past-title">Past weekends</h2>
+              <p class="band__hint">{all.length} weekends so far</p>
+            </div>
+            <ul class="archive">
+              {archive.map((iss) => {
+                const issAreas = uniqueAreas(iss.data.picks);
+                return (
+                  <li>
+                    <a class="archive__row" href={withBase(`issues/${iss.id}/`)}>
+                      <span class="archive__date">{iss.data.dateRange}</span>
+                      <span class="archive__name">{iss.data.title}</span>
+                      <span class="archive__meta">
+                        {stopCount(iss.data.picks.length)}
+                        {issAreas.length > 0 && ` · ${issAreas.join(' · ')}`}
+                      </span>
+                      <span class="archive__go" aria-hidden="true">→</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+      </>
     )}
-  </div>
+  </main>
+  <SiteFooter />
 </Base>
 
 <style>
-  .page {
-    color: var(--ink);
-    position: relative;
-    min-height: 100vh;
-    width: 100%;
-  }
-  .empty {
+  .home { background: var(--paper); color: var(--ink); }
+
+  /* ─── hero ─── */
+  .hero {
     max-width: 1240px;
     margin: 0 auto;
-    padding: clamp(80px, 18vh, 200px) clamp(20px, 5vw, 64px);
-    animation: gmRise 0.5s var(--ease-out) both;
+    padding: clamp(26px, 4vw, 44px) clamp(20px, 5vw, 64px) clamp(28px, 4vw, 46px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
   }
-  .empty .kicker {
+  .eyebrow {
+    margin: 0 0 10px;
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
+    font-size: 12px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--rust);
-    margin-bottom: 8px;
   }
-  .empty .wordmark {
+  .title {
     margin: 0;
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: clamp(34px, 6vw, 68px);
-    line-height: 0.92;
-    letter-spacing: -0.025em;
-    color: var(--ink);
+    font-size: clamp(34px, 5.4vw, 62px);
+    line-height: 0.96;
+    letter-spacing: -0.02em;
   }
-  .empty__note {
-    margin: 28px 0 0;
+  .lede {
+    margin: 16px 0 0;
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: clamp(18px, 2vw, 24px);
-    color: var(--taupe);
+    font-size: clamp(17px, 1.7vw, 21px);
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 46ch;
   }
-  .marquee-bar {
-    border-bottom: 1.5px solid var(--ink);
-  }
-  .home {
-    background: var(--paper);
-    min-height: 100vh;
-    padding-bottom: 120px;
-    animation: gmRise 0.5s var(--ease-out) both;
-  }
-
-  /* masthead */
-  .masthead {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: 28px clamp(20px, 5vw, 64px) 18px;
+  .chips {
+    list-style: none;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 24px;
     flex-wrap: wrap;
+    gap: 9px;
+    margin: 20px 0 0;
+    padding: 0;
   }
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--rust);
-    margin-bottom: 8px;
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--cream);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #332b22;
   }
-  .wordmark {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: clamp(34px, 6vw, 68px);
-    line-height: 0.92;
-    letter-spacing: -0.025em;
-    color: var(--ink);
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 26px 0 0;
   }
-  .masthead__meta {
-    text-align: right;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--taupe);
-    line-height: 1.9;
-  }
-  .masthead__fresh { color: var(--rust); }
-
-  .bleed {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: 0 clamp(20px, 5vw, 64px);
-  }
-  .hr-ink { height: 1.5px; background: var(--ink); }
-
-  /* cover spread */
-  .spread {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: clamp(24px, 4vw, 48px) clamp(20px, 5vw, 64px) 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-    gap: clamp(24px, 3vw, 48px);
-    align-items: stretch;
-  }
-
-  .cover-tile {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 14px 24px;
     border: 1.5px solid var(--ink);
-    border-radius: 14px;
-    overflow: hidden;
-    text-align: left;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 600;
     text-decoration: none;
-    min-height: 440px;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+  }
+  .btn--primary { background: var(--rust); color: var(--cream); }
+  .btn--primary:hover { background: #8f3318; }
+  .btn--ghost { background: transparent; color: var(--ink); }
+  .btn--ghost:hover { background: var(--cream); }
+  .btn:active { transform: translateY(1px); }
+
+  /* ─── cover poster ─── */
+  .poster {
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 40px;
+    min-height: 400px;
+    padding: 24px 26px 26px;
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
     box-shadow: 0 18px 44px rgba(34, 28, 22, 0.13);
     transition: transform 0.3s var(--ease-out);
   }
-  .cover-tile:hover { transform: translateY(-4px); }
-  .cover-tile__grain {
+  .poster:hover { transform: translateY(-4px); }
+  .poster__grain {
     position: absolute;
     inset: 0;
     background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.07) 1px, transparent 0);
     background-size: 13px 13px;
     pointer-events: none;
   }
-  .cover-tile__top {
-    position: relative;
-    padding: 26px 28px;
-    display: flex;
+  .poster__top,
+  .poster__bottom { position: relative; display: flex; flex-direction: column; gap: 12px; }
+  .poster__top {
+    flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
-  .cover-tile__bottom { position: relative; padding: 0 28px 28px; }
-  .cover-tile__weather {
+  .poster__weather {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -277,193 +272,155 @@ const latestHref = latest ? withBase(`issues/${latest.id}/`) : withBase('/');
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    opacity: 0.85;
-    margin-bottom: 14px;
+    opacity: 0.9;
   }
-  .cover-tile__title {
+  .poster__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(28px, 2.6vw, 36px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  .poster__cue {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* ─── bands ─── */
+  .band { border-top: 1.5px solid var(--ink); }
+  .wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: clamp(26px, 3.4vw, 40px) clamp(20px, 5vw, 64px) clamp(30px, 4vw, 44px);
+  }
+  .band__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 0 0 18px;
+  }
+  .band__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(22px, 2.8vw, 30px);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+  .band__hint {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ─── stops ─── */
+  .stops { list-style: none; margin: 0; padding: 0; }
+  .stop { border-top: 1px solid var(--rule-soft); }
+  .stop:first-child { border-top: 1.5px solid var(--rule); }
+  .stop:last-child { border-bottom: 1.5px solid var(--rule); }
+  .stop__link {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 17px 6px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s, padding-left 0.2s var(--ease-out);
+  }
+  .stop__link:hover { background: var(--cream); padding-left: 14px; }
+  .stop__no {
+    flex: none;
+    min-width: 30px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1;
+  }
+  .stop__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .stop__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(19px, 2.1vw, 23px);
+    line-height: 1.2;
+  }
+  .stop__meta {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .stop__go { flex: none; font-size: 20px; color: var(--rust); }
+
+  /* ─── past weekends ─── */
+  .archive { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--rule); }
+  .archive li { border-bottom: 1px solid var(--rule-soft); }
+  .archive__row {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 15px 6px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s, padding-left 0.2s var(--ease-out);
+  }
+  .archive__row:hover { background: var(--cream); padding-left: 14px; }
+  .archive__date {
+    flex: none;
+    width: 92px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .archive__name {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(18px, 1.9vw, 21px);
+    line-height: 1.25;
+  }
+  .archive__meta {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .archive__go { font-size: 18px; color: var(--rust); }
+
+  /* ─── empty state ─── */
+  .empty {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: clamp(70px, 16vh, 170px) clamp(20px, 5vw, 64px);
+  }
+  .empty__title {
     margin: 0;
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: clamp(30px, 4.4vw, 52px);
-    line-height: 0.95;
-    letter-spacing: -0.02em;
+    font-size: clamp(34px, 6vw, 68px);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
   }
-  .cover-tile__teaser {
-    margin: 14px 0 0;
+  .empty__note {
+    margin: 26px 0 0;
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: clamp(15px, 1.5vw, 19px);
-    line-height: 1.4;
-    max-width: 30ch;
-    opacity: 0.92;
+    font-size: clamp(18px, 2vw, 24px);
+    color: var(--muted);
   }
 
-  /* contents */
-  .contents { display: flex; flex-direction: column; }
-  .contents__eyebrow {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--rust);
-    margin-bottom: 6px;
-  }
-  .contents__sub {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 18px;
-    color: var(--taupe);
-    margin-bottom: 18px;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 18px;
-  }
-  .contents__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .pick {
-    width: 100%;
-    text-align: left;
-    text-decoration: none;
-    border-bottom: 1px solid #E8DFCD;
-    padding: 15px 4px;
-    display: flex;
-    gap: 18px;
-    align-items: baseline;
-    transition: padding-left 0.25s var(--ease-out), background 0.2s;
-  }
-  .pick:hover { padding-left: 12px; background: var(--cream); }
-  .pick__no {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 22px;
-    min-width: 30px;
-  }
-  .pick__body { flex: 1; }
-  .pick__name {
-    display: block;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 19px;
-    line-height: 1.2;
-    color: var(--ink);
-  }
-  .pick__meta {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #8A8073;
-    margin-top: 4px;
-  }
-  .btn-read {
-    margin-top: 24px;
-    align-self: flex-start;
-    background: var(--clay);
-    color: var(--cream);
-    border: 1.5px solid var(--ink);
-    border-radius: 999px;
-    padding: 14px 26px;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 15px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .btn-read:hover { background: #8F3318; }
-  .btn-read:active { transform: translateY(1px); }
-  .btn-read__arrow { font-size: 18px; }
-
-  /* back issues */
-  .back {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: clamp(48px, 6vw, 88px) clamp(20px, 5vw, 64px) 40px;
-  }
-  .back__head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    border-bottom: 1.5px solid var(--ink);
-    padding-bottom: 14px;
-    margin-bottom: 28px;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .back__head h3 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(22px, 3vw, 34px);
-    letter-spacing: -0.02em;
-  }
-  .back__count {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--taupe);
-  }
-  .back__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: clamp(18px, 2.2vw, 28px);
-  }
-  .issue-card {
-    text-align: left;
-    text-decoration: none;
-    border: 1.5px solid var(--ink);
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 3 / 4;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-    transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
-  }
-  .issue-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 36px rgba(34, 28, 22, 0.16);
-  }
-  .issue-card__grain {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.06) 1px, transparent 0);
-    background-size: 12px 12px;
-    pointer-events: none;
-  }
-  .issue-card__top {
-    position: relative;
-    padding: 16px 18px;
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .issue-card__bottom { position: relative; padding: 0 18px 18px; }
-  .issue-card__bottom h4 {
-    margin: 0 0 8px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 23px;
-    line-height: 0.98;
-    letter-spacing: -0.015em;
-  }
-  .issue-card__read {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    opacity: 0.85;
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-top: 24px; }
+    .poster { display: none; }
+    .actions .btn { flex: 1 1 auto; justify-content: center; }
+    .archive__meta { display: none; }
   }
 </style>
