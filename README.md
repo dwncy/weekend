@@ -1,16 +1,29 @@
 # The Jakarta Weekender
 
-An Astro + Markdown implementation of the **Editorial Magazine** direction from
-the *Jakarta Weekend Guide* design handoff. Each weekend is a Markdown file; the
-site renders a magazine-style home (masthead, cover spread, contents, back
-issues) and a per-issue detail page with the full article.
+An Astro + Markdown weekend guide, built from the **Editorial Magazine**
+direction of the *Jakarta Weekend Guide* design handoff and organised around the
+plan itself: the home page answers "what are we doing this weekend?", and each
+plan page is a scannable list of stops you can jump around.
+
+## What a visit looks like
+
+- **Home** — the weekend's date, title, weather, stop count and one primary
+  action; the stops as numbered rows that deep-link into the plan; "If you only
+  do three things" next to the plan; past weekends as a compact list.
+- **Plan page** — an at-a-glance summary (stops, areas, best window, rain
+  fallback), a stop picker that stays in view while you scroll (a rail on
+  desktop, chips on mobile), one labelled section per stop (when / where /
+  budget / weather, then why it's worth it, then the source), and links to the
+  previous and next weekend.
+
+Both views keep the editorial type, paper palette, area colours and cover art.
 
 ## Stack
 
 - **Astro 5** static site (no client framework needed)
 - **Markdown content collection** (`src/content/issues/`) typed by a Zod schema
-- `remark-breaks` to preserve single-line breaks inside picks, matching the
-  original prototype's markdown renderer
+- `remark-breaks` to preserve single-line breaks in any Markdown that still
+  renders as an article, matching the original prototype's markdown renderer
 - Web fonts (Fraunces / Newsreader / Inter / Space Mono) standing in for the
   original "grain & mortar" design-system tokens, which were not shipped in the
   handoff
@@ -31,10 +44,9 @@ authoring format:
 
 ```yaml
 ---
-no: 13                       # issue number — highest is the "latest" issue
 title: "..."
 dateRange: "Jun 27–29"       # short, for cards/header
-dateLong: "June 27–29, 2026" # full, for the detail page
+dateLong: "June 27–29, 2026" # full, for the plan page
 year: "2026"
 teaser: "..."
 weather:
@@ -42,23 +54,42 @@ weather:
   label: "..."
   hi: "33°"
 cover: sunwheat              # sunwheat | rainclay | heritage | mangrove
-picks:                       # powers the "In this issue" contents list + area tags
+bestWindow: "..."            # optional — "at a glance" card
+rainPlan: "..."              # optional — "if the sky turns" line
+picks:                       # stop rows, area chips, archive rows
   - no: 1
     name: "..."
-    place: "..."
-    area: "South"            # South | Central | North | Old Town | West → accent color
-    when: "Sat 9–11am"
+    area: "South"            # South | Central | North | Old Town | West → accent colour
+    date: "Sat 9–11am"
     budget: "Rp 75–150k"
-    why: "..."
-top3:
-  - { name: "...", note: "..." }
 ---
 
-Markdown article body goes here…
+Intro paragraph (one or two sentences)…
+
+## 1. Stop name
+**Date:** …
+**Area:** North — JIExpo Kemayoran
+**Why go:** …
+**Rough budget:** …
+**Weather:** …
+**Source:** [Label](https://…)
+
+## 2. Next stop
+…
+
+## If you only do three things
+1. **Stop name** — why it made the cut.
 ```
 
+The plan page is generated from that body: `src/lib/plan.ts` parses the intro,
+the `## N. Stop` sections (place, why, weather, source — `Date` and
+`Rough budget` are checked but the frontmatter picks stay the single source for
+those two) and the top-three list at build time. If a file drifts from the format — a new heading,
+a missing fact — the build prints a warning and the page falls back to rendering
+the Markdown article, so new content can never break the site.
+
 The issue with the highest `no` automatically becomes the cover story on the
-home page; the rest fall into "Back issues".
+home page; the rest fall into "Past weekends".
 
 ## Project layout
 
@@ -67,16 +98,25 @@ src/
   content/issues/      # one Markdown file per weekend
   content.config.ts    # collection schema
   layouts/Base.astro   # html shell + web fonts
-  components/          # Marquee, Weather (glyph)
-  lib/theme.ts         # area colors, cover themes, marquee items
+  components/
+    SiteHeader.astro   # wordmark + "this weekend / past weekends" nav
+    SiteFooter.astro
+    AtAGlance.astro    # stops, areas, best window, rain fallback
+    StopPicker.astro   # sticky stop rail (desktop) / chips (mobile) + scroll spy
+    TopThree.astro     # "if you only do three things"
+    Weather.astro      # weather glyph
+  lib/
+    plan.ts            # parses a weekend body into stops + top three
+    theme.ts           # area colours, cover themes, issue numbers, base URLs
   pages/
-    index.astro            # magazine home
-    issues/[...slug].astro # per-issue detail page
-  styles/global.css    # design tokens + article prose styles
+    index.astro            # home: this weekend + past weekends
+    issues/[...slug].astro # one plan: summary, stop picker, stops
+  styles/global.css    # design tokens, focus styles, article prose
+design/wireframes/     # the reviewed wireframes behind this layout
 ```
 
 ## Origin
 
 The original handoff (`.dc.html` prototype + `support.js` runtime) is kept under
 `_import/` for reference. It contained three design directions (Magazine,
-Journal, City Guide); this project implements the first one only.
+Journal, City Guide); this project implements the first one.

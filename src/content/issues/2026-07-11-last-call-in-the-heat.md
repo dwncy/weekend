@@ -9,6 +9,8 @@ weather:
   label: "Hot, clouds pm"
   hi: "33°"
 cover: rainclay
+bestWindow: "Sat late afternoon–evening · Sun morning"
+rainPlan: "Museum MACAN — fully indoors; one ticket covers five exhibitions"
 picks:
   - no: 1
     name: "Jakarta Fair final-weekend concerts"

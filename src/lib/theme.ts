@@ -8,9 +8,22 @@ export const AREA_COLORS: Record<string, string> = {
   West: '#8F3318',
 };
 
+// Text-safe variants of the area accents, so coloured labels and numerals keep
+// their area hue while staying at or above 4.5:1 on --paper. The brighter
+// AREA_COLORS stay for fills and other non-text decoration.
+export const AREA_TEXT_COLORS: Record<string, string> = {
+  South: '#A83F20',
+  Central: '#7A5609',
+  North: '#1E6E5A',
+  'Old Town': '#3F5B45',
+  West: '#8F3318',
+};
+
 export const COVERS = {
   sunwheat: { bg: '#E0A93B', fg: '#221C16' },
-  rainclay: { bg: '#C0492A', fg: '#F7F2E9' },
+  // Slightly deeper than the source palette's #C0492A so the 11px cover text
+  // clears 4.5:1 against it.
+  rainclay: { bg: '#B5452A', fg: '#F7F2E9' },
   heritage: { bg: '#3F5B45', fg: '#F7F2E9' },
   mangrove: { bg: '#1E6E5A', fg: '#F7F2E9' },
 } as const;
@@ -19,6 +32,10 @@ export type CoverKey = keyof typeof COVERS;
 
 export function areaColor(area: string): string {
   return AREA_COLORS[area] ?? '#6E6456';
+}
+
+export function areaTextColor(area: string): string {
+  return AREA_TEXT_COLORS[area] ?? '#5E5548';
 }
 
 export function cover(key: CoverKey) {
@@ -46,38 +63,7 @@ export function issueNumbers(ids: string[]): Map<string, number> {
   return map;
 }
 
-// Unique areas in first-seen order — used for the detail page's area tags.
-export function uniqueAreas(
-  picks: { area: string }[],
-): { name: string; color: string }[] {
-  const seen = new Set<string>();
-  const out: { name: string; color: string }[] = [];
-  for (const p of picks) {
-    if (!seen.has(p.area)) {
-      seen.add(p.area);
-      out.push({ name: p.area, color: areaColor(p.area) });
-    }
-  }
-  return out;
-}
-
-// The scrolling marquee strip is built from the latest issue's facts.
-export function marqueeItems(
-  no: number,
-  latest: {
-    dateRange: string;
-    year: string;
-    weather: { hi: string; label: string };
-    picks: unknown[];
-  },
-): string[] {
-  return [
-    'No. ' + no,
-    latest.dateRange + ', ' + latest.year,
-    latest.weather.hi + ' · ' + latest.weather.label,
-    latest.picks.length + ' picks this weekend',
-    'Pasar Santa · Car Free Day · Senopati · Kota Tua · PIK',
-    'Honest plans for two',
-    'Smooth as butter',
-  ];
+// Unique area names in first-seen order — used for area chips and archive rows.
+export function uniqueAreas(picks: { area: string }[]): string[] {
+  return [...new Set(picks.map((p) => p.area))];
 }

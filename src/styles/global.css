@@ -16,7 +16,10 @@
   --rust: #A83F20;
   --clay: #C0492A;
   --taupe: #6E6456;
+  /* Same family as --taupe, dark enough for 6.2:1 on --paper (AA at any size). */
+  --muted: #5E5548;
   --rule: #D9CEB6;
+  --rule-soft: #E8DFCD;
 }
 
 * { box-sizing: border-box; }
@@ -33,6 +36,21 @@ body {
 button { font-family: inherit; cursor: pointer; }
 a { color: inherit; }
 ::selection { background: #E0A93B; color: #161310; }
+
+html { scroll-behavior: smooth; }
+/* Sticky in-page nav needs breathing room above a jumped-to section. */
+[id] { scroll-margin-top: 24px; }
+
+/* Visible focus for keyboard users on every link and control. */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 3px solid var(--rust);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 
 @keyframes gmRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes gmFade { from { opacity: 0; } to { opacity: 1; } }

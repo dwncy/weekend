@@ -1,0 +1,50 @@
+---
+interface Props {
+  items: { name: string; note: string }[];
+  /** Anchor id, so the stop picker can link to it. */
+  id?: string;
+}
+const { items, id = 'top-three' } = Astro.props;
+---
+<section class="top3" id={id} aria-labelledby="top3-title">
+  <h2 class="top3__title" id="top3-title">If you only do three things</h2>
+  <ol class="top3__list">
+    {items.map((item) => (
+      <li class="top3__item">
+        <strong class="top3__name">{item.name}</strong>
+        <span class="top3__note"> — {item.note}</span>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .top3 {
+    border: 1.5px solid var(--ink);
+    border-radius: 12px;
+    background: var(--cream);
+    padding: 20px clamp(18px, 2.4vw, 26px) 22px;
+    margin: 28px 0 0;
+  }
+  .top3__title {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(19px, 2.2vw, 24px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .top3__list {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: var(--font-serif);
+    font-size: 17px;
+    line-height: 1.5;
+    color: #332b22;
+  }
+  .top3__item::marker { color: var(--rust); }
+  .top3__name { font-family: var(--font-sans); font-weight: 600; }
+</style>

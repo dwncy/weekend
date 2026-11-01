@@ -1,0 +1,83 @@
+---
+import { withBase } from '../lib/theme';
+
+interface Props {
+  /** `plan` shows a way back; `home` shows the two home sections. */
+  variant?: 'home' | 'plan';
+  /** Small plain label on the right, e.g. "No. 13 · Jul 11–12". */
+  label?: string;
+}
+
+const { variant = 'home', label } = Astro.props;
+const homeHref = withBase('/');
+---
+<header class="top">
+  <a class="top__wordmark" href={homeHref}>Our Weekend Plans</a>
+  <nav class="top__nav" aria-label={variant === 'plan' ? 'Back' : 'Sections'}>
+    {variant === 'plan' ? (
+      <>
+        <a class="top__link" href={homeHref}><span aria-hidden="true">←</span> All plans</a>
+        {label && <span class="top__label">{label}</span>}
+      </>
+    ) : (
+      <>
+        <a class="top__link" href={homeHref} aria-current="page">This weekend</a>
+        <a class="top__link" href={`${homeHref}#past`}>Past weekends</a>
+      </>
+    )}
+  </nav>
+</header>
+
+<style>
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px clamp(20px, 5vw, 64px);
+    border-bottom: 1.5px solid var(--ink);
+    background: var(--paper);
+  }
+  .top__wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 19px;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .top__nav {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(12px, 2vw, 20px);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .top__link {
+    color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .top__link:hover { color: var(--ink); }
+  .top__link[aria-current='page'] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
+  }
+  .top__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  @media (max-width: 560px) {
+    .top__wordmark { font-size: 16px; }
+    .top__nav { font-size: 13px; }
+    .top__label { display: none; }
+  }
+</style>
