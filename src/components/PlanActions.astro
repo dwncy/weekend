@@ -1,29 +1,27 @@
 ---
 // The plan's two whole-plan actions, shown under the header chips: one map link
-// covering every stop, and the add-to-calendar .ics download. Either can be
+// covering every stop, and the plan pre-filled in Google Calendar. Either can be
 // missing (no geocodable place, or a plan without a readable date), and the row
 // disappears when both are.
 interface Props {
   stops: number;
   mapUrl?: string;
-  calendarHref?: string;
-  /** Suggested name for the downloaded file, so it keeps its .ics extension. */
-  calendarFileName?: string;
+  calendarUrl?: string;
 }
 
-const { stops, mapUrl, calendarHref, calendarFileName } = Astro.props;
+const { stops, mapUrl, calendarUrl } = Astro.props;
 const mapLabel = stops === 1 ? 'Open the stop on a map' : `Map all ${stops} stops`;
 ---
-{(mapUrl || calendarHref) && (
+{(mapUrl || calendarUrl) && (
   <div class="actions">
     {mapUrl && (
       <a class="btn btn--primary" href={mapUrl} target="_blank" rel="noopener noreferrer">
         {mapLabel}{' '}<span aria-hidden="true">↗</span>
       </a>
     )}
-    {calendarHref && (
-      <a class="btn btn--ghost" href={calendarHref} download={calendarFileName}>
-        Add to calendar <span aria-hidden="true">↓</span>
+    {calendarUrl && (
+      <a class="btn btn--ghost" href={calendarUrl} target="_blank" rel="noopener noreferrer">
+        Add to Google Calendar{' '}<span aria-hidden="true">↗</span>
       </a>
     )}
   </div>

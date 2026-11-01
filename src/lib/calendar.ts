@@ -1,10 +1,11 @@
-// "Add to calendar" is a generated .ics file (RFC 5545) built once per plan at
-// build time, so one link works with Google Calendar, Apple Calendar and
-// Outlook without a third-party service or client-side script.
+// "Add to Google Calendar" opens Calendar's own new-event form with the weekend
+// already filled in, so the plan lands in the calendar without a file download,
+// a third-party API key or client-side script — the link is built at build time
+// from the same content as the page.
 //
-// The event is an all-day one covering the weekend: per-stop times are free text
-// ("11–12 July 2026; check daily lineup"), so the stops are listed in the event
-// description rather than given times of their own.
+// Per-stop times are free text ("11–12 July 2026; check daily lineup"), so the
+// event is one all-day weekend entry that lists the stops, the map link and the
+// plan page in its description.
 
 export interface PlanDayRange {
   /** First day of the plan, ISO (YYYY-MM-DD). */
@@ -13,18 +14,27 @@ export interface PlanDayRange {
   end: string;
 }
 
-export interface PlanCalendarEvent {
-  /** UID seed: the issue id, so re-importing updates one event. */
-  id: string;
-  title: string;
-  dates: PlanDayRange;
-  /** Description paragraphs; joined with newlines. */
-  description: string[];
-  url?: string;
-  location?: string;
+export interface PlanCalendarStop {
+  no: number;
+  name: string;
+  date?: string;
+  area?: string;
+  place?: string;
 }
 
-const PRODID = '-//The Jakarta Weekender//Weekend Plans//EN';
+export interface PlanCalendar {
+  title: string;
+  dates: PlanDayRange;
+  /** Intro line shown above the stops. */
+  teaser?: string;
+  stops: PlanCalendarStop[];
+  /** One map link covering the whole plan, repeated in the event. */
+  mapUrl?: string;
+  /** Public plan page. */
+  planUrl: string;
+}
+
+const TEMPLATE = 'https://calendar.google.com/calendar/render';
 
 const MONTH_NAMES = [
   'january',
@@ -52,8 +62,11 @@ function monthIndex(token: string | undefined): number | undefined {
   return index === -1 ? undefined : index;
 }
 
+function pad(value: number): string {
+  return String(value).padStart(2, '0');
+}
+
 function isoDay(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, '0');
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
 }
 
@@ -109,73 +122,42 @@ export function planDates(id: string, dateRange: string): PlanDayRange | undefin
   return { start: startIso, end: endIso };
 }
 
-/** RFC 5545 TEXT escaping. */
-function escapeText(value: string): string {
-  return value
-    .replace(/\\/g, '\\\\')
-    .replace(/;/g, '\\;')
-    .replace(/,/g, '\\,')
-    .replace(/\r?\n/g, '\\n');
+/** "North — JIExpo Kemayoran", or just the area. */
+function locationLine(stop: PlanCalendarStop): string {
+  return stop.place ? `${stop.area ?? ''} — ${stop.place}`.replace(/^ — /, '') : (stop.area ?? '');
 }
 
-/** UTC timestamp for DTSTAMP, e.g. 20260711T093000Z. */
-function stamp(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, '0');
-  return `${isoDay(date).replace(/-/g, '')}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
+function describe(plan: PlanCalendar): string {
+  const stops = plan.stops.map((stop) => {
+    const when = [stop.date, locationLine(stop)].filter(Boolean).join(' · ');
+    return `${stop.no}. ${stop.name}${when ? ` — ${when}` : ''}`;
+  });
+
+  return [
+    ...(plan.teaser ? [plan.teaser, ''] : []),
+    ...stops,
+    ...(plan.mapUrl ? ['', `All stops on a map: ${plan.mapUrl}`] : []),
+    '',
+    `Full plan: ${plan.planUrl}`,
+  ].join('\n');
 }
 
 /**
- * RFC 5545 §3.1 folding: no line longer than 75 octets, and a folded
- * continuation starts with a single space (which counts towards its own limit).
+ * Google Calendar's template link: an all-day event (bare YYYYMMDD dates, with
+ * the end exclusive, like the calendar UI shows it) that the person only has to
+ * save.
  */
-function fold(line: string): string {
-  const encoder = new TextEncoder();
-  const folded: string[] = [];
-  let current = '';
-  let octets = 0;
-  let limit = 75;
-
-  for (const char of line) {
-    const size = encoder.encode(char).length;
-    if (octets + size > limit) {
-      folded.push(current);
-      current = '';
-      octets = 0;
-      limit = 74;
-    }
-    current += char;
-    octets += size;
-  }
-  folded.push(current);
-
-  return folded.join('\r\n ');
-}
-
-export function buildIcs(event: PlanCalendarEvent): string {
-  // An all-day DTEND is exclusive, so it is the day after the last day.
-  const end = new Date(`${event.dates.end}T00:00:00Z`);
+export function googleCalendarUrl(plan: PlanCalendar): string {
+  const end = new Date(`${plan.dates.end}T00:00:00Z`);
   end.setUTCDate(end.getUTCDate() + 1);
 
-  const lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    `PRODID:${PRODID}`,
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    `UID:${event.id}@jakarta-weekender`,
-    `DTSTAMP:${stamp(new Date())}`,
-    `DTSTART;VALUE=DATE:${event.dates.start.replace(/-/g, '')}`,
-    `DTEND;VALUE=DATE:${isoDay(end).replace(/-/g, '')}`,
-    `SUMMARY:${escapeText(event.title)}`,
-    `DESCRIPTION:${escapeText(event.description.join('\n'))}`,
-    ...(event.location ? [`LOCATION:${escapeText(event.location)}`] : []),
-    ...(event.url ? [`URL:${event.url}`] : []),
-    // A plan should not block the whole day as busy in a shared calendar.
-    'TRANSP:TRANSPARENT',
-    'END:VEVENT',
-    'END:VCALENDAR',
+  const params = [
+    'action=TEMPLATE',
+    `text=${encodeURIComponent(plan.title)}`,
+    `dates=${plan.dates.start.replace(/-/g, '')}/${isoDay(end).replace(/-/g, '')}`,
+    `details=${encodeURIComponent(describe(plan))}`,
+    ...(plan.stops[0]?.place ? [`location=${encodeURIComponent(plan.stops[0].place)}`] : []),
   ];
 
-  return lines.map(fold).join('\r\n') + '\r\n';
+  return `${TEMPLATE}?${params.join('&')}`;
 }

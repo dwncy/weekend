@@ -92,7 +92,7 @@ the Markdown article, so new content can never break the site.
 The issue with the highest `no` automatically becomes the cover story on the
 home page; the rest fall into "Past weekends".
 
-## Map link and calendar file
+## Map link and Google Calendar
 
 Both are generated from the content — no extra frontmatter to author:
 
@@ -100,12 +100,13 @@ Both are generated from the content — no extra frontmatter to author:
   place (`**Area:** North — JIExpo Kemayoran` → `JIExpo Kemayoran, Jakarta`), in
   plan order. Google accepts 11 places per link; a longer plan is capped, with a
   build warning.
-- **Add to calendar** — `/plans/<file-name>.ics`, a standards-based all-day
-  event covering the weekend, with the stops, the map link and the plan page in
-  its description. The first day comes from the file name (`2026-07-11-…`) and
-  the last day from `dateRange` (`Jul 11–12`). Rename a file or drop the range
-  and the event falls back to a single day; a missing leading date hides the
-  link and prints a build warning.
+- **Add to Google Calendar** — opens Calendar's own new-event form pre-filled
+  with an all-day entry for the weekend: the plan title, one line per stop, the
+  map link and the plan page in the description, and the first stop as the
+  location. Nothing downloads; the person only saves the event. The first day
+  comes from the file name (`2026-07-11-…`) and the last day from `dateRange`
+  (`Jul 11–12`). Rename a file or drop the range and the event falls back to a
+  single day; a missing leading date hides the link and prints a build warning.
 
 ## Project layout
 
@@ -125,12 +126,11 @@ src/
   lib/
     plan.ts            # parses a weekend body into stops + top three
     map.ts             # one Google Maps route covering every stop
-    calendar.ts        # weekend dates + the .ics built from a plan
+    calendar.ts        # weekend dates + the Google Calendar link for a plan
     theme.ts           # area colours, cover themes, issue numbers, base URLs
   pages/
     index.astro            # home: this weekend + past weekends
     issues/[...slug].astro # one plan: summary, stop picker, stops
-    plans/[slug].ics.ts    # one .ics calendar file per plan
   styles/global.css    # design tokens, focus styles, article prose
 design/wireframes/     # the reviewed wireframes behind this layout
 design/evidence/       # before/after screenshots used in pull requests

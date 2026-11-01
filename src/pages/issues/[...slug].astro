@@ -11,7 +11,7 @@ import Weather from '../../components/Weather.astro';
 import { areaTextColor, issueNumbers, uniqueAreas, withBase } from '../../lib/theme';
 import { parsePlan, planStops, renderInline } from '../../lib/plan';
 import { allStopsMapUrl, MAX_MAP_STOPS } from '../../lib/map';
-import { planDates } from '../../lib/calendar';
+import { googleCalendarUrl, planDates } from '../../lib/calendar';
 
 export async function getStaticPaths() {
   const issues = await getCollection('issues');
@@ -58,7 +58,7 @@ for (const pick of picks) {
 const stops = planStops(picks, plan);
 const areas = uniqueAreas(picks);
 
-// One map link for the whole plan, and one .ics built by the plans/ endpoint.
+// One map link for the whole plan, and one Google Calendar link pre-filled with it.
 const mapUrl = allStopsMapUrl(stops);
 if (mapUrl && stops.length > MAX_MAP_STOPS) {
   console.warn(
@@ -69,7 +69,17 @@ const calendarDates = planDates(issue.id, issue.data.dateRange);
 if (!calendarDates) {
   console.warn(`[calendar] ${issue.id}: no readable plan date in the file name; skipping add-to-calendar.`);
 }
-const calendarHref = calendarDates ? withBase(`plans/${issue.id}.ics`) : undefined;
+const planUrl = new URL(withBase(`issues/${issue.id}/`), Astro.site ?? Astro.url).href;
+const calendarUrl = calendarDates
+  ? googleCalendarUrl({
+      title: `${issue.data.title} · ${issue.data.dateRange}`,
+      dates: calendarDates,
+      teaser: issue.data.teaser,
+      stops,
+      mapUrl,
+      planUrl,
+    })
+  : undefined;
 ---
 <Base title={`${issue.data.title} · Our Weekend Plans`} description={issue.data.teaser}>
   <SiteHeader variant="plan" label={`No. ${no} · ${issue.data.dateRange}`} />
@@ -88,12 +98,7 @@ const calendarHref = calendarDates ? withBase(`plans/${issue.id}.ics`) : undefin
         ))}
       </ul>
       {structured && (
-        <PlanActions
-          stops={stops.length}
-          mapUrl={mapUrl}
-          calendarHref={calendarHref}
-          calendarFileName={`weekend-${issue.id}.ics`}
-        />
+        <PlanActions stops={stops.length} mapUrl={mapUrl} calendarUrl={calendarUrl} />
       )}
     </header>
 
