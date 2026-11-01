@@ -4,11 +4,14 @@ import Base from '../../layouts/Base.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import AtAGlance from '../../components/AtAGlance.astro';
+import PlanActions from '../../components/PlanActions.astro';
 import StopPicker from '../../components/StopPicker.astro';
 import TopThree from '../../components/TopThree.astro';
 import Weather from '../../components/Weather.astro';
 import { areaTextColor, issueNumbers, uniqueAreas, withBase } from '../../lib/theme';
-import { parsePlan, renderInline } from '../../lib/plan';
+import { parsePlan, planStops, renderInline } from '../../lib/plan';
+import { allStopsMapUrl, MAX_MAP_STOPS } from '../../lib/map';
+import { googleCalendarUrl, planDates } from '../../lib/calendar';
 
 export async function getStaticPaths() {
   const issues = await getCollection('issues');
@@ -52,22 +55,31 @@ for (const pick of picks) {
   }
 }
 
-const stops = picks.map((pick) => {
-  const detail = plan.stops.find((stop) => stop.no === pick.no);
-  return {
-    no: pick.no,
-    name: pick.name,
-    area: pick.area,
-    date: pick.date,
-    place: detail?.place,
-    budget: pick.budget,
-    why: detail?.why,
-    weather: detail?.weather,
-    source: detail?.source,
-  };
-});
-
+const stops = planStops(picks, plan);
 const areas = uniqueAreas(picks);
+
+// One map link for the whole plan, and one Google Calendar link pre-filled with it.
+const mapUrl = allStopsMapUrl(stops);
+if (mapUrl && stops.length > MAX_MAP_STOPS) {
+  console.warn(
+    `[map] ${issue.id}: ${stops.length} stops is beyond Google Maps' ${MAX_MAP_STOPS}-place limit; the link covers the first ${MAX_MAP_STOPS}.`,
+  );
+}
+const calendarDates = planDates(issue.id, issue.data.dateRange);
+if (!calendarDates) {
+  console.warn(`[calendar] ${issue.id}: no readable plan date in the file name; skipping add-to-calendar.`);
+}
+const planUrl = new URL(withBase(`issues/${issue.id}/`), Astro.site ?? Astro.url).href;
+const calendarUrl = calendarDates
+  ? googleCalendarUrl({
+      title: `${issue.data.title} · ${issue.data.dateRange}`,
+      dates: calendarDates,
+      teaser: issue.data.teaser,
+      stops,
+      mapUrl,
+      planUrl,
+    })
+  : undefined;
 ---
 <Base title={`${issue.data.title} · Our Weekend Plans`} description={issue.data.teaser}>
   <SiteHeader variant="plan" label={`No. ${no} · ${issue.data.dateRange}`} />
@@ -85,6 +97,9 @@ const areas = uniqueAreas(picks);
           <li class="chip chip--area" style={`color:${areaTextColor(area)}`}>{area}</li>
         ))}
       </ul>
+      {structured && (
+        <PlanActions stops={stops.length} mapUrl={mapUrl} calendarUrl={calendarUrl} />
+      )}
     </header>
 
     {structured ? (

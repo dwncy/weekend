@@ -42,6 +42,15 @@ export interface PlanTopNote {
   note: string;
 }
 
+/** One `picks` entry from a weekend's frontmatter. */
+export interface PlanPick {
+  no: number;
+  name: string;
+  area: string;
+  date: string;
+  budget: string;
+}
+
 export interface ParsedPlan {
   ok: boolean;
   intro: string;
@@ -154,6 +163,27 @@ export function parsePlan(body: string | undefined): ParsedPlan {
 }
 
 const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+
+/**
+ * Frontmatter picks merged with the body detail. Picks stay the single source
+ * for "when" and "budget"; the body supplies the place, why, weather and source.
+ */
+export function planStops(picks: PlanPick[], plan: ParsedPlan): PlanStop[] {
+  return picks.map((pick) => {
+    const detail = plan.stops.find((stop) => stop.no === pick.no);
+    return {
+      no: pick.no,
+      name: pick.name,
+      area: pick.area,
+      date: pick.date,
+      place: detail?.place,
+      budget: pick.budget,
+      why: detail?.why,
+      weather: detail?.weather,
+      source: detail?.source,
+    };
+  });
+}
 
 /** Minimal inline Markdown for the parsed one-paragraph intro. */
 export function renderInline(markdown: string): string {
