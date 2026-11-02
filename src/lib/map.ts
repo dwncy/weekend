@@ -20,7 +20,7 @@ export const MAX_MAP_STOPS = 11;
 function placeQuery(stop: MapStop): string {
   const query = (stop.place ?? stop.name).split('/')[0].trim();
   if (!query) return '';
-  return /jakarta/i.test(query) ? query : `${query}, Jakarta`;
+  return /jakarta/i.test(query) ? query : `${query}, Jakarta, Indonesia`;
 }
 
 /**
