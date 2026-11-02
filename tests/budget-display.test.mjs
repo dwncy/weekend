@@ -13,7 +13,7 @@ const texts = (re) => [...html.matchAll(re)].map((m) => decode(m[1]));
 
 test('budget filter options show their Rupiah range', () => {
   const options = texts(/name="spend"[^>]*>\s*<span[^>]*>([^<]*)</g);
-  assert.deepEqual(options, ['Any', 'Low (< Rp 5k)', 'Up to mid (≤ Rp 1dsak)']);
+  assert.deepEqual(options, ['Any', 'Low (< Rp 5k)', 'Up to mid (≤ Rp asdasda)']);
 });
 
 test('budget filter heading says the range is entry per person', () => {
