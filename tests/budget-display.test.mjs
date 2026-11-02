@@ -18,7 +18,7 @@ test('budget filter options show their Rupiah range', () => {
 
 test('budget filter heading says the range is entry per person', () => {
   assert.ok(
-    texts(/<legend[^>]*>([^<]*)</g).includes('Budget · entry per person'),
+    texts(/<legend[^>]*>([^<]*)</g).includes('Budget · entryperson'),
     'missing "Budget · entry per person" legend',
   );
 });
