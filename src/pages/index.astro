@@ -5,15 +5,16 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import TopThree from '../components/TopThree.astro';
 import Weather from '../components/Weather.astro';
-import { cover, areaTextColor, issueNumbers, uniqueAreas, withBase } from '../lib/theme';
+import PlanFinder from '../components/PlanFinder.astro';
+import { AREA_COLORS, cover, areaTextColor, issueNumbers, uniqueAreas, withBase } from '../lib/theme';
 import { parsePlan } from '../lib/plan';
+import { searchText } from '../lib/filters';
 
 const all = await getCollection('issues');
 const numbers = issueNumbers(all.map((i) => i.id));
 // Newest first — highest derived issue number on top.
 const issues = [...all].sort((a, b) => numbers.get(b.id)! - numbers.get(a.id)!);
 const latest = issues[0];
-const archive = issues.slice(1);
 
 const latestNo = latest ? numbers.get(latest.id)! : 0;
 const latestCover = latest ? cover(latest.data.cover) : null;
@@ -28,6 +29,27 @@ const areas = uniqueAreas(picks);
 function stopCount(count: number) {
   return count === 1 ? '1 stop' : `${count} stops`;
 }
+
+// Every weekend, newest first, for the searchable list. Areas follow the
+// palette order so the filter chips stay stable as weekends are added.
+const usedAreas = uniqueAreas(issues.flatMap((iss) => iss.data.picks));
+const allAreas = [
+  ...Object.keys(AREA_COLORS).filter((a) => usedAreas.includes(a)),
+  ...usedAreas.filter((a) => !(a in AREA_COLORS)),
+];
+const weekends = issues.map((iss) => {
+  const issAreas = uniqueAreas(iss.data.picks);
+  return {
+    id: iss.id,
+    href: withBase(`issues/${iss.id}/`),
+    dateRange: iss.data.dateRange,
+    title: iss.data.title,
+    isLatest: iss.id === latest?.id,
+    meta: stopCount(iss.data.picks.length) + (issAreas.length > 0 ? ` · ${issAreas.join(' · ')}` : ''),
+    search: searchText(iss.data),
+    picks: iss.data.picks,
+  };
+});
 ---
 <Base title="Our Weekend Plans">
   <SiteHeader variant="home" />
@@ -116,27 +138,10 @@ function stopCount(count: number) {
         <section class="band" id="past" aria-labelledby="past-title">
           <div class="wrap">
             <div class="band__head">
-              <h2 class="band__title" id="past-title">Past weekends</h2>
-              <p class="band__hint">{all.length} weekends so far</p>
+              <h2 class="band__title" id="past-title">All weekends</h2>
+              <p class="band__hint">{all.length} weekends so far · search or filter</p>
             </div>
-            <ul class="archive">
-              {archive.map((iss) => {
-                const issAreas = uniqueAreas(iss.data.picks);
-                return (
-                  <li>
-                    <a class="archive__row" href={withBase(`issues/${iss.id}/`)}>
-                      <span class="archive__date">{iss.data.dateRange}</span>
-                      <span class="archive__name">{iss.data.title}</span>
-                      <span class="archive__meta">
-                        {stopCount(iss.data.picks.length)}
-                        {issAreas.length > 0 && ` · ${issAreas.join(' · ')}`}
-                      </span>
-                      <span class="archive__go" aria-hidden="true">→</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
+            <PlanFinder areas={allAreas} weekends={weekends} />
           </div>
         </section>
       </>
@@ -358,43 +363,6 @@ function stopCount(count: number) {
   }
   .stop__go { flex: none; font-size: 20px; color: var(--rust); }
 
-  /* ─── past weekends ─── */
-  .archive { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--rule); }
-  .archive li { border-bottom: 1px solid var(--rule-soft); }
-  .archive__row {
-    display: flex;
-    align-items: baseline;
-    gap: 18px;
-    padding: 15px 6px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: inherit;
-    transition: background 0.2s, padding-left 0.2s var(--ease-out);
-  }
-  .archive__row:hover { background: var(--cream); padding-left: 14px; }
-  .archive__date {
-    flex: none;
-    width: 92px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    color: var(--muted);
-  }
-  .archive__name {
-    flex: 1;
-    min-width: 0;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(18px, 1.9vw, 21px);
-    line-height: 1.25;
-  }
-  .archive__meta {
-    font-family: var(--font-sans);
-    font-size: 14px;
-    color: var(--muted);
-  }
-  .archive__go { font-size: 18px; color: var(--rust); }
-
   /* ─── empty state ─── */
   .empty {
     max-width: 1240px;
@@ -421,6 +389,5 @@ function stopCount(count: number) {
     .hero { grid-template-columns: 1fr; padding-top: 24px; }
     .poster { display: none; }
     .actions .btn { flex: 1 1 auto; justify-content: center; }
-    .archive__meta { display: none; }
   }
 </style>

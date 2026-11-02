@@ -9,7 +9,10 @@ plan page is a scannable list of stops you can jump around.
 
 - **Home** — the weekend's date, title, weather, stop count and one primary
   action; the stops as numbered rows that deep-link into the plan; "If you only
-  do three things" next to the plan; past weekends as a compact list.
+  do three things" next to the plan; every weekend in a searchable list with
+  filters for area, half or full day, budget and "works in rain". With a stop
+  filter on, each weekend lists the stops that fit, linked into its plan; the
+  filters live in the URL so a filtered list can be shared.
 - **Plan page** — an at-a-glance summary (stops, areas, best window, rain
   fallback), two whole-plan actions (one map link covering every stop, and an
   add-to-calendar download), a stop picker that stays in view while you scroll
@@ -63,6 +66,9 @@ picks:                       # stop rows, area chips, archive rows
     area: "South"            # South | Central | North | Old Town | West → accent colour
     date: "Sat 9–11am"
     budget: "Rp 75–150k"
+    duration: half           # optional — half | full       → "Time" filter
+    spend: low               # optional — low | mid | high  → "Budget" filter
+    rainProof: true          # optional — still works in rain → "Weather" filter
 ---
 
 Intro paragraph (one or two sentences)…
@@ -89,8 +95,10 @@ those two) and the top-three list at build time. If a file drifts from the forma
 a missing fact — the build prints a warning and the page falls back to rendering
 the Markdown article, so new content can never break the site.
 
-The issue with the highest `no` automatically becomes the cover story on the
-home page; the rest fall into "Past weekends".
+The newest weekend automatically becomes the cover story on the home page, and
+every weekend appears in "All weekends". A stop without a filter tag never
+matches that filter; the budget filter means "up to", so "Up to mid" keeps low
+and mid stops.
 
 ## Map link and Google Calendar
 
@@ -121,15 +129,17 @@ src/
     AtAGlance.astro    # stops, areas, best window, rain fallback
     PlanActions.astro  # whole-plan map link + add-to-calendar
     StopPicker.astro   # sticky stop rail (desktop) / chips (mobile) + scroll spy
+    PlanFinder.astro   # searchable, filterable list of every weekend
     TopThree.astro     # "if you only do three things"
     Weather.astro      # weather glyph
   lib/
     plan.ts            # parses a weekend body into stops + top three
     map.ts             # one Google Maps route covering every stop
     calendar.ts        # weekend dates + the Google Calendar link for a plan
+    filters.ts         # filter tag labels + search text for the plan finder
     theme.ts           # area colours, cover themes, issue numbers, base URLs
   pages/
-    index.astro            # home: this weekend + past weekends
+    index.astro            # home: this weekend + all weekends
     issues/[...slug].astro # one plan: summary, stop picker, stops
   styles/global.css    # design tokens, focus styles, article prose
 design/wireframes/     # the reviewed wireframes behind this layout

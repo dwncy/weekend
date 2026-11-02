@@ -36,6 +36,11 @@ const issues = defineCollection({
           area: z.string(), // South | Central | North | Old Town | West
           date: z.string(), // when the event runs, e.g. "27–28 June 2026"
           budget: z.string(),
+          // Optional tags for the home page's plan filters. A stop without a
+          // tag simply doesn't match that filter.
+          duration: z.enum(['half', 'full']).optional(), // half day | full day
+          spend: z.enum(['low', 'mid', 'high']).optional(), // rough budget tier
+          rainProof: z.boolean().optional(), // still works if it rains
         }),
       )
       .default([]),

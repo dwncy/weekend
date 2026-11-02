@@ -1,0 +1,426 @@
+---
+import { areaTextColor } from '../lib/theme';
+import { stopTags, type Duration, type Spend } from '../lib/filters';
+
+interface Props {
+  areas: string[];
+  weekends: {
+    id: string;
+    href: string;
+    dateRange: string;
+    title: string;
+    isLatest: boolean;
+    meta: string;
+    search: string;
+    picks: {
+      no: number;
+      name: string;
+      area: string;
+      duration?: Duration;
+      spend?: Spend;
+      rainProof?: boolean;
+    }[];
+  }[];
+}
+
+const { areas, weekends } = Astro.props;
+---
+<div class="finder" data-finder>
+  <form class="filters" data-filters role="search" aria-label="Find a plan" hidden>
+    <label class="search">
+      <span class="filters__label">Search</span>
+      <input
+        class="search__input"
+        type="search"
+        name="q"
+        placeholder="Try “museum”, “Ancol” or “July”"
+        autocomplete="off"
+      />
+    </label>
+
+    <div class="groups">
+      <fieldset class="group">
+        <legend class="filters__label">Area</legend>
+        <div class="opts">
+          {areas.map((area) => (
+            <label class="opt">
+              <input type="checkbox" name="area" value={area} />
+              <span>{area}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend class="filters__label">Time</legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="duration" value="" checked /><span>Any</span></label>
+          <label class="opt"><input type="radio" name="duration" value="half" /><span>Half day</span></label>
+          <label class="opt"><input type="radio" name="duration" value="full" /><span>Full day</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend class="filters__label">Budget</legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="spend" value="" checked /><span>Any</span></label>
+          <label class="opt"><input type="radio" name="spend" value="low" /><span>Low</span></label>
+          <label class="opt"><input type="radio" name="spend" value="mid" /><span>Up to mid</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend class="filters__label">Weather</legend>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" name="rain" value="1" /><span>Works in rain</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="filters__foot">
+      <p class="filters__count" data-count aria-live="polite"></p>
+      <button class="filters__clear" type="reset">Clear filters</button>
+    </div>
+  </form>
+
+  <ul class="archive">
+    {weekends.map((wk) => (
+      <li class="archive__item" data-weekend data-search={wk.search}>
+        <a class="archive__row" href={wk.href}>
+          <span class="archive__date">{wk.dateRange}</span>
+          <span class="archive__name">
+            {wk.title}
+            {wk.isLatest && <span class="archive__tag">This weekend</span>}
+          </span>
+          <span class="archive__meta">{wk.meta}</span>
+          <span class="archive__go" aria-hidden="true">→</span>
+        </a>
+        <ul class="matches" data-matches hidden>
+          {wk.picks.map((pick) => (
+            <li
+              data-stop
+              data-area={pick.area}
+              data-duration={pick.duration ?? ''}
+              data-spend={pick.spend ?? ''}
+              data-rain={pick.rainProof ? '1' : ''}
+            >
+              <a class="match" href={`${wk.href}#stop-${pick.no}`}>
+                <span class="match__no" style={`color:${areaTextColor(pick.area)}`}>{pick.no}</span>
+                <span class="match__name">{pick.name}</span>
+                <span class="match__tags">{[pick.area, ...stopTags(pick)].join(' · ')}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+
+  <p class="finder__empty" data-empty hidden>
+    No weekend fits all of that yet.
+    <button class="filters__clear" type="button" data-clear>Clear filters</button>
+  </p>
+</div>
+
+<script is:inline>
+  // Filters the weekend list in place. With filters on a stop (area, time,
+  // budget, rain), a weekend stays only if one of its stops fits all of them,
+  // and those stops are listed under it. The state is kept in the URL so a
+  // filtered list can be shared or reloaded.
+  document.addEventListener('DOMContentLoaded', function () {
+    var root = document.querySelector('[data-finder]');
+    if (!root) return;
+    var form = root.querySelector('[data-filters]');
+    var weekends = Array.prototype.slice.call(root.querySelectorAll('[data-weekend]'));
+    var count = root.querySelector('[data-count]');
+    var empty = root.querySelector('[data-empty]');
+    var RANK = { low: 1, mid: 2, high: 3 };
+    var KEYS = ['q', 'area', 'duration', 'spend', 'rain'];
+
+    var read = function () {
+      var data = new FormData(form);
+      return {
+        q: String(data.get('q') || '').trim().toLowerCase(),
+        areas: data.getAll('area').map(String),
+        duration: String(data.get('duration') || ''),
+        spend: String(data.get('spend') || ''),
+        rain: data.has('rain'),
+      };
+    };
+
+    var fits = function (stop, f) {
+      var s = stop.dataset;
+      if (f.areas.length && f.areas.indexOf(s.area) === -1) return false;
+      if (f.duration && s.duration !== f.duration) return false;
+      if (f.spend && !(RANK[s.spend] && RANK[s.spend] <= RANK[f.spend])) return false;
+      if (f.rain && s.rain !== '1') return false;
+      return true;
+    };
+
+    var syncUrl = function () {
+      var params = new URLSearchParams();
+      new FormData(form).forEach(function (value, key) {
+        if (KEYS.indexOf(key) !== -1 && String(value).trim()) params.append(key, String(value).trim());
+      });
+      var query = params.toString();
+      var url = window.location.pathname + (query ? '?' + query : '') + window.location.hash;
+      window.history.replaceState(null, '', url);
+    };
+
+    var apply = function () {
+      var f = read();
+      var words = f.q.split(/\s+/).filter(Boolean);
+      var byStop = f.areas.length > 0 || !!f.duration || !!f.spend || f.rain;
+      var shown = 0;
+      var stops = 0;
+
+      weekends.forEach(function (wk) {
+        var text = wk.dataset.search || '';
+        var textOk = words.every(function (w) { return text.indexOf(w) !== -1; });
+        var fitting = 0;
+        wk.querySelectorAll('[data-stop]').forEach(function (stop) {
+          var ok = fits(stop, f);
+          stop.hidden = !ok;
+          if (ok) fitting += 1;
+        });
+        var visible = textOk && (!byStop || fitting > 0);
+        wk.hidden = !visible;
+        wk.querySelector('[data-matches]').hidden = !byStop;
+        if (visible) {
+          shown += 1;
+          stops += fitting;
+        }
+      });
+
+      var filtered = byStop || words.length > 0;
+      var label = shown === 1 ? '1 weekend' : shown + ' weekends';
+      count.textContent = !filtered
+        ? 'Showing all ' + label
+        : label + (byStop ? ' · ' + (stops === 1 ? '1 stop fits' : stops + ' stops fit') : '');
+      empty.hidden = shown > 0;
+      syncUrl();
+    };
+
+    var restore = function () {
+      var params = new URLSearchParams(window.location.search);
+      form.elements.q.value = params.get('q') || '';
+      var areas = params.getAll('area');
+      form.querySelectorAll('input[name="area"]').forEach(function (box) {
+        box.checked = areas.indexOf(box.value) !== -1;
+      });
+      ['duration', 'spend'].forEach(function (name) {
+        var value = params.get(name) || '';
+        form.querySelectorAll('input[name="' + name + '"]').forEach(function (radio) {
+          radio.checked = radio.value === value;
+        });
+      });
+      form.elements.rain.checked = params.has('rain');
+    };
+
+    form.addEventListener('input', apply);
+    form.addEventListener('change', apply);
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    // 'reset' fires before the fields are cleared.
+    form.addEventListener('reset', function () { window.setTimeout(apply, 0); });
+    root.querySelector('[data-clear]').addEventListener('click', function () { form.reset(); });
+
+    form.hidden = false;
+    restore();
+    apply();
+  });
+</script>
+
+<style>
+  .finder [hidden] { display: none !important; }
+
+  /* ─── filters ─── */
+  .filters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0 0 22px;
+    padding: 18px 18px 14px;
+    border: 1.5px solid var(--rule);
+    border-radius: 14px;
+    background: var(--cream);
+  }
+  .filters__label {
+    display: block;
+    margin: 0 0 8px;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+  .search { display: block; }
+  .search__input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+  }
+  .search__input::placeholder { color: var(--muted); }
+  .search__input:focus-visible { outline: 3px solid var(--rust); outline-offset: 2px; }
+
+  .groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px clamp(18px, 3vw, 36px);
+  }
+  .group { margin: 0; padding: 0; border: 0; min-width: 0; }
+  .opts { display: flex; flex-wrap: wrap; gap: 7px; }
+  .opt { position: relative; display: inline-flex; }
+  .opt input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .opt span {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 13px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--paper);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #332b22;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .opt:hover span { border-color: var(--ink); }
+  .opt input:checked + span {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--cream);
+  }
+  .opt input:focus-visible + span { outline: 3px solid var(--rust); outline-offset: 2px; }
+
+  .filters__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .filters__count {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .filters__clear {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rust);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ─── weekend list ─── */
+  .archive { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--rule); }
+  .archive__item { border-bottom: 1px solid var(--rule-soft); }
+  .archive__row {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 15px 6px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s, padding-left 0.2s var(--ease-out);
+  }
+  .archive__row:hover { background: var(--cream); padding-left: 14px; }
+  .archive__date {
+    flex: none;
+    width: 92px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .archive__name {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(18px, 1.9vw, 21px);
+    line-height: 1.25;
+  }
+  .archive__tag {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--rust);
+    color: var(--cream);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    vertical-align: 3px;
+  }
+  .archive__meta {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .archive__go { font-size: 18px; color: var(--rust); }
+
+  .matches {
+    list-style: none;
+    margin: -4px 0 0;
+    padding: 0 6px 14px 116px;
+  }
+  .match {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 6px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .match:hover { background: var(--cream); }
+  .match__no {
+    flex: none;
+    min-width: 16px;
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+  .match__name { font-family: var(--font-sans); font-size: 15px; font-weight: 600; }
+  .match__tags { font-family: var(--font-sans); font-size: 13px; color: var(--muted); }
+
+  .finder__empty {
+    margin: 0;
+    padding: 22px 6px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--muted);
+  }
+  .finder__empty .filters__clear { margin-left: 6px; font-style: normal; }
+
+  @media (max-width: 900px) {
+    .archive__meta { display: none; }
+    .matches { padding-left: 6px; }
+  }
+</style>
