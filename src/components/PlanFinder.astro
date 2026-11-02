@@ -1,6 +1,6 @@
 ---
 import { areaTextColor } from '../lib/theme';
-import { stopTags, type Duration, type Spend } from '../lib/filters';
+import { SPEND_RANGES, stopTags, type Duration, type Spend } from '../lib/filters';
 
 interface Props {
   areas: string[];
@@ -61,11 +61,11 @@ const { areas, weekends } = Astro.props;
       </fieldset>
 
       <fieldset class="group">
-        <legend class="filters__label">Budget</legend>
+        <legend class="filters__label">Budget · entry per person</legend>
         <div class="opts">
           <label class="opt"><input type="radio" name="spend" value="" checked /><span>Any</span></label>
-          <label class="opt"><input type="radio" name="spend" value="low" /><span>Low</span></label>
-          <label class="opt"><input type="radio" name="spend" value="mid" /><span>Up to mid</span></label>
+          <label class="opt"><input type="radio" name="spend" value="low" /><span>Low ({SPEND_RANGES.low})</span></label>
+          <label class="opt"><input type="radio" name="spend" value="mid" /><span>Up to mid (≤ Rp 150k)</span></label>
         </div>
       </fieldset>
 
