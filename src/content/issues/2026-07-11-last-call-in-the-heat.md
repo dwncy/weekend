@@ -17,21 +17,33 @@ picks:
     area: "North"
     date: "11–12 July 2026; check daily lineup"
     budget: "Paid entry + snacks/shopping"
+    duration: full
+    spend: mid
+    rainProof: true
   - no: 2
     name: "Museum MACAN exhibition stack"
     area: "West"
     date: "13 June–4 October 2026; on this weekend"
     budget: "Museum ticket; promos may apply"
+    duration: half
+    spend: mid
+    rainProof: true
   - no: 3
     name: "Ancol seaside and mini-attraction loop"
     area: "North"
     date: "Available 11–12 July 2026; check same-day promos"
     budget: "Rp 35k+ entry; attractions extra"
+    duration: half
+    spend: mid
+    rainProof: false
   - no: 4
     name: "Ragunan green morning"
     area: "South"
     date: "Available 11–12 July 2026; Tuesday–Sunday"
     budget: "Low entry + transport/snacks"
+    duration: half
+    spend: low
+    rainProof: false
 ---
 
 **Weekend of July 11–12.** Jakarta still looks hot and humid, so you two should keep the plan cute, shaded, and easy to bail from if the clouds get dramatic. Make Jakarta Fair or MACAN the real anchor, then keep Ancol or Ragunan as the “only if we wake up with energy” option. Double-check official pages before leaving because ticket promos, hours, and lineups can shift fast.

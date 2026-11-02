@@ -17,21 +17,33 @@ picks:
     area: "Central"
     date: "4–5 July 2026; check daily lineup"
     budget: "Paid entry + snacks/shopping"
+    duration: full
+    spend: mid
+    rainProof: true
   - no: 2
     name: "Museum MACAN exhibitions"
     area: "West"
     date: "13 June–4 October 2026; on this weekend"
     budget: "Museum ticket; promo may apply"
+    duration: half
+    spend: mid
+    rainProof: true
   - no: 3
     name: "Ancol seaside loop"
     area: "North"
     date: "Available 4–5 July 2026; check same-day events"
     budget: "Rp 35k+ entry; attractions extra"
+    duration: half
+    spend: mid
+    rainProof: false
   - no: 4
     name: "Ragunan green morning"
     area: "South"
     date: "Available 4–5 July 2026; Tuesday–Sunday"
     budget: "Low entry + transport/snacks"
+    duration: half
+    spend: low
+    rainProof: false
 ---
 
 **Weekend of July 4–5.** Jakarta looks warm, humid, and a bit cloud-mooded, so you two should keep the plan cute but flexible. Pick one indoor anchor, one snacky wander, and double-check official pages before leaving because lineups, ticket slots, and weather can shift fast.

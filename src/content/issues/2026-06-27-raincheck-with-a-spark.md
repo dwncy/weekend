@@ -17,26 +17,41 @@ picks:
     area: "North"
     date: "27–28 June 2026"
     budget: "Spectator ticket varies"
+    duration: full
+    spend: mid
+    rainProof: true
   - no: 2
     name: "Ancol Sunset Sound"
     area: "North"
     date: "27 June 2026"
     budget: "Ticket + food; check Ancol"
+    duration: half
+    spend: mid
+    rainProof: false
   - no: 3
     name: "Museum MACAN exhibitions"
     area: "West"
     date: "23 May–4 Oct 2026; on this weekend"
     budget: "Museum ticket + workshop if booked"
+    duration: half
+    spend: mid
+    rainProof: true
   - no: 4
     name: "Jakarta Fair Kemayoran"
     area: "Central"
     date: "On this weekend; check daily lineup"
     budget: "Paid entry + snacks/shopping"
+    duration: full
+    spend: mid
+    rainProof: true
   - no: 5
     name: "Ragunan green morning"
     area: "South"
     date: "Open Tue–Sun; on this weekend"
     budget: "Rp 4k+ entry, more for extras"
+    duration: half
+    spend: low
+    rainProof: false
 ---
 
 **Weekend of June 27–28.** Jakarta looks like it wants to be hot first and dramatic later, so you two should keep the outdoor bits early or golden-hour and save the indoor plans for backup. Pick one ticketed anchor, keep snacks flexible, and double-check official pages before leaving because lineups, hours, and prices love doing tiny plot twists.
