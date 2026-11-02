@@ -9,10 +9,17 @@ export const DURATION_LABELS: Record<Duration, string> = {
   full: 'Full day',
 };
 
+// Budget tiers are the entry cost per person, before food and transport.
+export const SPEND_RANGES: Record<Spend, string> = {
+  low: '< Rp 5k',
+  mid: 'Rp 5k–150k',
+  high: '> Rp 150k',
+};
+
 export const SPEND_LABELS: Record<Spend, string> = {
-  low: 'Low budget',
-  mid: 'Mid budget',
-  high: 'Splurge',
+  low: `Low budget (${SPEND_RANGES.low})`,
+  mid: `Mid budget (${SPEND_RANGES.mid})`,
+  high: `Splurge (${SPEND_RANGES.high})`,
 };
 
 interface Pick {

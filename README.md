@@ -67,7 +67,7 @@ picks:                       # stop rows, area chips, archive rows
     date: "Sat 9–11am"
     budget: "Rp 75–150k"
     duration: half           # optional — half | full       → "Time" filter
-    spend: low               # optional — low | mid | high  → "Budget" filter
+    spend: mid               # optional — low | mid | high  → "Budget" filter
     rainProof: true          # optional — still works in rain → "Weather" filter
 ---
 
@@ -99,6 +99,15 @@ The newest weekend automatically becomes the cover story on the home page, and
 every weekend appears in "All weekends". A stop without a filter tag never
 matches that filter; the budget filter means "up to", so "Up to mid" keeps low
 and mid stops.
+
+Budget tiers are the entry cost per person, before food and transport, and the
+filter shows each range (`SPEND_RANGES` in `src/lib/filters.ts`):
+
+| `spend` | Entry per person |
+| --- | --- |
+| `low` | under Rp 5k |
+| `mid` | Rp 5k–150k |
+| `high` | over Rp 150k |
 
 ## Map link and Google Calendar
 
