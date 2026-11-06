@@ -1,6 +1,6 @@
 ---
 import { areaTextColor } from '../lib/theme';
-import { SPEND_RANGES, stopTags, type Duration, type Spend } from '../lib/filters';
+import { DASH_PATTERN, SPEND_RANGES, stopTags, type Duration, type Spend } from '../lib/filters';
 
 interface Props {
   areas: string[];
@@ -25,7 +25,7 @@ interface Props {
 
 const { areas, weekends } = Astro.props;
 ---
-<div class="finder" data-finder>
+<div class="finder" data-finder data-dashes={DASH_PATTERN}>
   <form class="filters" data-filters role="search" aria-label="Find a plan" hidden>
     <label class="search">
       <span class="filters__label">Search</span>
@@ -137,10 +137,12 @@ const { areas, weekends } = Astro.props;
     var RANK = { low: 1, mid: 2, high: 3 };
     var KEYS = ['q', 'area', 'duration', 'spend', 'rain'];
 
+    var dashes = new RegExp(root.dataset.dashes, 'g');
+
     var read = function () {
       var data = new FormData(form);
       return {
-        q: String(data.get('q') || '').trim().toLowerCase(),
+        q: String(data.get('q') || '').replace(dashes, '-').trim().toLowerCase(),
         areas: data.getAll('area').map(String),
         duration: String(data.get('duration') || ''),
         spend: String(data.get('spend') || ''),

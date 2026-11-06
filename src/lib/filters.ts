@@ -39,6 +39,12 @@ export function stopTags(pick: Pick): string[] {
   return tags;
 }
 
+// Dashes people type for a range (hyphen, en dash, em dash, minus) all count
+// as a plain hyphen. The plan finder's script gets this pattern at build time
+// to treat the typed query the same way.
+export const DASH_PATTERN = '[\\u2010-\\u2015\\u2212]';
+const DASHES = new RegExp(DASH_PATTERN, 'g');
+
 // Lower-cased text the search box matches against: every word must appear.
 export function searchText(data: {
   title: string;
@@ -59,5 +65,6 @@ export function searchText(data: {
     ...data.picks.flatMap((p) => [p.name, p.area]),
   ]
     .join(' ')
+    .replace(DASHES, '-')
     .toLowerCase();
 }
