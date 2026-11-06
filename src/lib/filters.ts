@@ -39,6 +39,10 @@ export function stopTags(pick: Pick): string[] {
   return tags;
 }
 
+// Dashes people type for a range (hyphen, en dash, em dash, minus) all count
+// as a plain hyphen. Keep in sync with `normalize` in PlanFinder.astro.
+const DASHES = /[\u2010-\u2015\u2212]/g;
+
 // Lower-cased text the search box matches against: every word must appear.
 export function searchText(data: {
   title: string;
@@ -59,5 +63,6 @@ export function searchText(data: {
     ...data.picks.flatMap((p) => [p.name, p.area]),
   ]
     .join(' ')
+    .replace(DASHES, '-')
     .toLowerCase();
 }

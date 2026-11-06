@@ -137,10 +137,15 @@ const { areas, weekends } = Astro.props;
     var RANK = { low: 1, mid: 2, high: 3 };
     var KEYS = ['q', 'area', 'duration', 'spend', 'rain'];
 
+    // Same dash rule as searchText() in lib/filters.ts.
+    var normalize = function (q) {
+      return q.replace(/[\u2010-\u2015\u2212]/g, '-').trim().toLowerCase();
+    };
+
     var read = function () {
       var data = new FormData(form);
       return {
-        q: String(data.get('q') || '').trim().toLowerCase(),
+        q: normalize(String(data.get('q') || '')),
         areas: data.getAll('area').map(String),
         duration: String(data.get('duration') || ''),
         spend: String(data.get('spend') || ''),
