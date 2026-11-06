@@ -13,11 +13,13 @@ const searchFor = (title) => {
   throw new Error(`no weekend titled ${title}`);
 };
 
-// The query normalizer from the finder's inline script, so the test uses the
-// same code as the browser.
-const fn = html.match(/var normalize = (function \([\s\S]*?\n {4}\});/);
-assert.ok(fn, 'finder script has no normalize function');
-const normalize = new Function(`return ${fn[1]}`)();
+// The dash pattern the finder script gets from filters.ts at build time.
+const pattern = html.match(/data-finder[^>]*data-dashes="([^"]*)"/);
+assert.ok(pattern, 'finder has no data-dashes pattern');
+const dashes = new RegExp(pattern[1], 'g');
+
+// Same query handling as the finder script.
+const normalize = (q) => q.replace(dashes, '-').trim().toLowerCase();
 
 // Same rule as the finder: every word of the query must appear.
 const matches = (text, query) =>

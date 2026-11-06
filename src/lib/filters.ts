@@ -40,8 +40,10 @@ export function stopTags(pick: Pick): string[] {
 }
 
 // Dashes people type for a range (hyphen, en dash, em dash, minus) all count
-// as a plain hyphen. Keep in sync with `normalize` in PlanFinder.astro.
-const DASHES = /[\u2010-\u2015\u2212]/g;
+// as a plain hyphen. The plan finder's script gets this pattern at build time
+// to treat the typed query the same way.
+export const DASH_PATTERN = '[\\u2010-\\u2015\\u2212]';
+const DASHES = new RegExp(DASH_PATTERN, 'g');
 
 // Lower-cased text the search box matches against: every word must appear.
 export function searchText(data: {
