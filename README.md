@@ -30,7 +30,7 @@ Both views keep the editorial type, paper palette, area colours and cover art.
 - **Markdown content collection** (`src/content/issues/`) typed by a Zod schema
 - `remark-breaks` to preserve single-line breaks in any Markdown that still
   renders as an article, matching the original prototype's markdown renderer
-- Web fonts (Fraunces / Newsreader / Inter / Space Mono) standing in for the
+- Web fonts (Outfit / Literata / JetBrains Mono) standing in for the
   original "grain & mortar" design-system tokens, which were not shipped in the
   handoff
 

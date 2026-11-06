@@ -1,13 +1,11 @@
 ---
 import '../styles/global.css';
-import { FONT_VARIANTS } from '../lib/fonts';
 
 interface Props {
   title: string;
   description?: string;
 }
 const { title, description = 'A love note with logistics — Jakarta weekend plans for the two of us.' } = Astro.props;
-const fontHrefs = Object.fromEntries(Object.entries(FONT_VARIANTS).map(([id, v]) => [id, v.href]));
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -21,29 +19,9 @@ const fontHrefs = Object.fromEntries(Object.entries(FONT_VARIANTS).map(([id, v])
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400;1,7..72,500&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <script is:inline define:vars={{ fontHrefs }}>
-      (() => {
-        const key = 'font-variant';
-        let id;
-        try {
-          const param = new URLSearchParams(location.search).get('font');
-          if (param === 'default') localStorage.removeItem(key);
-          else if (param && fontHrefs[param]) localStorage.setItem(key, param);
-          id = localStorage.getItem(key);
-        } catch {
-          id = new URLSearchParams(location.search).get('font');
-        }
-        if (!id || !fontHrefs[id]) return;
-        document.documentElement.dataset.font = id;
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = fontHrefs[id];
-        document.head.appendChild(link);
-      })();
-    </script>
   </head>
   <body>
     <slot />
