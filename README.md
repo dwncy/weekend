@@ -1,5 +1,7 @@
 # The Jakarta Weekender
 
+Hello from Slack! 👋
+
 An Astro + Markdown weekend guide, built from the **Editorial Magazine**
 direction of the *Jakarta Weekend Guide* design handoff and organised around the
 plan itself: the home page answers "what are we doing this weekend?", and each
